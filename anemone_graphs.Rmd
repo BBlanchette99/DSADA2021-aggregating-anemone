@@ -139,9 +139,43 @@ pam_mod <- gamlss(Fv_Fm_av ~ Treatment*Measurement, data = pam_timeseries2, fami
 
 summary(pam_mod)
 ```
+
+
+
 ```{r}
 #Kruskal-Wallis for each day: 
-PAM_Nov
+pam_nov1 <- pam_clean %>%
+filter(Measurement == "T1")
+kruskal.test(Fv_Fm_av ~ Treatment, data = pam_nov1)
+
+pam_nov6am <- pam_clean %>%
+filter(Measurement == "T2")
+kruskal.test(Fv_Fm_av ~ Treatment, data = pam_nov6am)
+
+pam_nov6pm <- pam_clean %>%
+filter(Measurement == "T3")
+kruskal.test(Fv_Fm_av ~ Treatment, data = pam_nov6pm)
+
+pam_nov7pm <- pam_clean %>%
+filter(Measurement == "T5")
+kruskal.test(Fv_Fm_av ~ Treatment, data = pam_nov7pm)
+
+pam_nov8am <- pam_clean %>%
+filter(Measurement == "T6")
+kruskal.test(Fv_Fm_av ~ Treatment, data = pam_nov8am)
+
+pam_nov8pm <- pam_clean %>%
+filter(Measurement == "T7")
+kruskal.test(Fv_Fm_av ~ Treatment, data = pam_nov8pm)
+
+pam_nov9 <- pam_clean %>%
+filter(Measurement == "T8")
+kruskal.test(Fv_Fm_av ~ Treatment, data = pam_nov9)
+
+pam_nov13 <- pam_clean %>%
+filter(Measurement == "T9")
+kruskal.test(Fv_Fm_av ~ Treatment, data = pam_nov13)
+
 
 ```
 
