@@ -18,57 +18,153 @@ library(gamlss)
 library(car)
 library(performance)
 library(LambertW)
+library(FSA)
 library(tidyverse)
-pam<-read_delim("Aggregating_PAM_measurements.csv", delim = ",")
-base <- read_delim("base_measurements.csv", delim = ",")
-food <- read_delim("Aggregating_Feeding.csv", delim = ",")
-```
 
+#Loading data
+pam<-read_delim("pam_data.csv", delim = ",")
+base <- read_delim("base_diameter_data.csv", delim = ",")
+food <- read_delim("feeding_time_data.csv", delim = ",")
+response <- read_delim("open_closed_data.csv", delim = ",")
+```
+# Cleaning data
 ```{r}
-#Clean data
+#Function to calculate standard error for summarizing data
+standard_error <- function(x) sd(x) / sqrt(length(x))
+
+#PAM data
 pam_clean <- pam %>%
-  filter(Measurement != "NA") 
-base_clean<-base%>%
-  filter(Treatment != "NA")%>%
-  na.omit(Average_Diameter)
-
-
-pam_clean$Anemone_ID <- as.factor(pam_clean$Anemone_ID)
-pam_clean$Bucket <- as.factor(pam_clean$Bucket)
-food$Feeding_Time_Min <- as.numeric(food$Feeding_Time_Min)
-  as.character(base_clean$Date)
-  base_clean$Date <- factor(base_clean$Date, levels =c("Oct 31", "Nov 5", "Nov 9", "Nov 13"))
-
-```
-# PAM data
-
-```{r}
-#Line graph of PAM (morning vs afternoon during heatwave)
-standard_error <- function(x) sd(x) / sqrt(length(x)) 
+  filter(Measurement != "NA")%>% #Filtering out dates with PAM measurements that we are not using due to technical errors
+  select(Date,Time,Measurement,Treatment,Bin,Site,Anemone_ID,Fv_Fm_av)%>%
+  mutate(Date = as.POSIXct(as.character(Date),   format="%m-%d-%Y %H:%M:%S"),Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin), Measurement = as.factor((Measurement)))
 
 pam_summary <- pam_clean%>%
-  group_by(Measurement, Treatment) %>%
+  group_by(Date, Measurement, Treatment) %>%
   summarize(mean_FvFm = mean(Fv_Fm_av), se_FvFm = standard_error(Fv_Fm_av))
 
-ggplot(data = pam_summary, aes(x=Measurement, y = mean_FvFm, group = Treatment, colour = Treatment)) +
-       geom_vline(xintercept=c("T2", "T7"), linetype = "dotted") +
-        theme_classic() +
-         geom_point() +
-        geom_line() +
-        geom_errorbar(aes(ymin = mean_FvFm - se_FvFm, ymax = mean_FvFm + se_FvFm), width=0.2)
-ggsave("pam_timeseries.png")
+#Base data
+base_clean<-base%>%
+  filter(Treatment != "NA" & Average_Diameter != "NA")%>% #Removing anemones that were included in initial measurements but were not included in treatments, and anemones that were not attached during base measurements
+  select(Date,Treatment,Bin,Site,Anemone_ID,Average_Diameter) %>%
+  mutate(Date = factor(Date, levels =c("31-Oct", "05-Nov", "09-Nov", "13-Nov")), Treatment = as.factor(Treatment), Anemone_ID = as.factor(Anemone_ID))
+
+base_summary <- base_clean%>%
+  group_by(Date, Treatment)%>%
+  summarize(mean_base = mean(Average_Diameter), se_base = standard_error(Average_Diameter))
+
+#Feeding time data
+food_clean <- food%>%
+  select(Date, Treatment, Bin, Site, Anemone_ID, Feeding_Time_Min)%>%
+  mutate(Feeding_Time_Min = as.numeric(Feeding_Time_Min))
+
+food_summary <- food%>%
+  group_by(Date, Treatment)%>%
+  summarize(mean_time = mean(Feeding_Time_Min), se_time = standard_error(Feeding_Time_Min))
 ```
+# PAM data
+## Plots
 ```{r}
+#Line graph of PAM (morning vs afternoon during heatwave)
+
+ggplot(data = pam_summary, 
+       aes(x=Date, 
+           y = mean_FvFm, 
+           group = Treatment, 
+           colour = Treatment)) +
+  theme_classic() +
+  geom_vline(xintercept = as.POSIXct("2021-11-06 09:00:00"),
+             linetype = "dotted", 
+             size = 1) +
+  geom_vline(xintercept = as.POSIXct("2021-11-08 16:00:00"), 
+             linetype = "dotted", 
+             size = 1)+
+  geom_point(size=2.5) +
+  geom_line(lwd = 1.5) +
+  geom_errorbar(aes(ymin = mean_FvFm - se_FvFm, 
+                    ymax = mean_FvFm + se_FvFm), 
+                    width=30000)+
+  labs(x="Date", 
+       y = "Photosynthetic efficiency (Fv/Fm)") +
+  scale_fill_manual(values = c('#89226AFF',
+                              '#2C728EFF',    
+                              '#E65154FF')) +
+  scale_colour_manual(values = c('#89226AFF',
+                                 '#2C728EFF',
+                                 '#E65154FF'))+
+  theme(axis.text=element_text(size=15),
+        axis.title=element_text(size=20), 
+        legend.text=element_text(size=15), 
+        legend.title=element_text(size=20))
+ggsave("pam_timeseries.png", width = 10, height = 7)
+
+#Graph of PAM data during heatwave, with heatwave time periods marked
+ggplot(data = filter(pam_summary, 
+                     Measurement != "T1" & Measurement != "T8" & Measurement != "T9"), 
+                     aes(x=Date, 
+                         y = mean_FvFm, 
+                         group = Treatment, 
+                         colour = Treatment)) +
+theme_classic() +
+geom_rect(xmin=as.POSIXct("2021-11-06 9:00:00"), 
+          xmax=as.POSIXct("2021-11-06 15:00:00"), 
+          ymin = 0.40, 
+          ymax = 0.60, 
+          fill = "grey84",
+          colour = "grey84")+
+geom_rect(xmin=as.POSIXct("2021-11-07 9:00:00"), 
+          xmax=as.POSIXct("2021-11-07 15:00:00"), 
+          ymin = 0.40, 
+          ymax = 0.60, 
+          fill = "grey84", 
+          colour = "grey84")+
+geom_rect(xmin=as.POSIXct("2021-11-08 9:00:00"), 
+          xmax=as.POSIXct("2021-11-08 15:00:00"), 
+          ymin = 0.40, 
+          ymax = 0.60,
+          fill = "grey84",
+          colour = "grey84")+
+geom_point() +
+geom_line() +
+geom_errorbar(aes(ymin = mean_FvFm - se_FvFm, 
+                  ymax = mean_FvFm + se_FvFm), 
+              width=10000)+
+labs(x="Date", 
+     y = "Photosynthetic efficiency (Fv/Fm)") +
+scale_fill_manual(values = c('#89226AFF',
+                             '#2C728EFF',           
+                             '#E65154FF')) +
+scale_colour_manual(values = c('#89226AFF', 
+                               '#2C728EFF', 
+                               '#E65154FF'))+
+  theme(axis.text=element_text(size=15),
+        axis.title=element_text(size=20), 
+        legend.text=element_text(size=15), 
+        legend.title=element_text(size=20))
+ggsave("pam_heatwave_only.png", width = 10, height = 7)
+
+#Boxplot of pam morning vs. afternoon data
 pam_heatwave<-pam_clean%>%
-  filter(Date == "11/6/2021" |  Date == "11/8/2021")
+  filter(Measurement == "T2" | 
+        Measurement == "T3" | 
+        Measurement == "T6" | 
+        Measurement == "T7") %>%
+  separate(Date, c('Day', 'Hour'), sep = " ", remove = T)
 pam_heatwave$Time <- factor(pam_heatwave$Time, levels = c("Morning", "Afternoon"))
 ggplot(pam_heatwave, aes(fill=Treatment, y=Fv_Fm_av, x=Time)) + 
   geom_boxplot() +
-  facet_grid(. ~ Date)
+  scale_fill_manual(values = c('#89226AFF',
+                             '#2C728EFF',           
+                             '#E65154FF')) +
+  theme(axis.text=element_text(size=15),
+        axis.title=element_text(size=20), 
+        legend.text=element_text(size=15), 
+        legend.title=element_text(size=20)) +
+  labs(x = "Time of day", y = "Photosynthetic efficiency (Fv/Fm)")+
+  facet_grid(. ~ Day)
 ggsave("pam_MorningAfternoon.png")
 ```
 
-
+## Testing distributions
 ```{r}
 #Checking assumptions of PAM data
 #Outliers
@@ -87,7 +183,16 @@ pam_clean %>%
 ggqqplot(pam_clean, "Fv_Fm_av", ggtheme = theme_bw()) +
   facet_grid(Measurement ~ Treatment, labeller = "label_both")
 
-#Conclusion: Data does not meet assumptions of ANOVA. Try other distributions.
+#Conclusion: Data does not meet assumptions of ANOVA. 
+
+#Transformations (acrsin and log)
+pam_clean <- pam_clean %>%
+  mutate(arcsin_Fv_Fm = asin(sqrt(Fv_Fm_av)), log_Fv_Fm = log(Fv_Fm_av))
+
+shapiro.test(pam_clean$arcsin_Fv_Fm)
+shapiro.test(pam_clean$log_Fv_Fm)
+
+#P-values for all transformations are less than 0.05. Data are still not normally distributed. 
 ```
 
 
@@ -96,24 +201,24 @@ ggqqplot(pam_clean, "Fv_Fm_av", ggtheme = theme_bw()) +
 
 fitDist(Fv_Fm_av, data = pam_clean, type = "real0to1", try.gamlss = T)
 
-#Generalized Beta 1 distribution found to be the best fit
+#Generalized Beta 1 distribution is best fit
 
 histDist(pam_clean$Fv_Fm_av, "GB1", density = F, main = "GB1")
 ```
+## Gamlss model
 ```{r}
 #Trying a gamlss model on PAM data (T1, T2, T8, and T9), using Gumbel distribution:
-pam_timeseries <- pam_clean %>% 
-  select(Fv_Fm_av, Treatment, Measurement, Anemone_ID, Event) %>%
+pam_long_timeseries <- pam_clean %>% 
   filter(Measurement == "T1" | Measurement  == "T2" | Measurement == "T8" | Measurement == "T9")%>%
   mutate(Treatment = as.factor(Treatment), 
-         Treatment = fct_relevel(Treatment, "Control", "25C", "30C"),
-         Event = as.factor(Event),
-         Measurement = as.factor(Measurement))
-
-fitDist(Fv_Fm_av, data = pam_timeseries, type = "realAll", try.gamlss = T)
+         Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))
+         
+fitDist(Fv_Fm_av, data = pam_long_timeseries, type = "realAll", try.gamlss = T)
+#Outcome: Gumbel is the best fit
 
 histDist(pam_timeseries$Fv_Fm_av, "GU", density = F, main = "Gumbel")
-pam_mod <- gamlss(Fv_Fm_av ~ Treatment*Measurement + random(Anemone_ID), data = pam_timeseries, family = GU())
+
+pam_mod <- gamlss(Fv_Fm_av ~ Treatment + Measurement + Treatment*Measurement + random(Anemone_ID), data = pam_long_timeseries, family = GU())
 
 
 summary(pam_mod)
@@ -121,113 +226,111 @@ summary(pam_mod)
 
 ```{r}
 #Trying a gamlss model on PAM data (T2, T3, T6, T7), using GB1 distribution:
-pam_timeseries2 <- pam_clean %>% 
-  select(Fv_Fm_av, Treatment, Measurement, Anemone_ID, Event) %>%
-  filter(Measurement == "T2" | Measurement  == "T3" | Measurement == "T6" | Measurement == "T7")%>%
+pam_short_timeseries <- pam_clean %>% 
+  filter(Measurement == "T2" | Measurement  == "T3" | Measurement == "T5" | Measurement == "T6" | Measurement == "T7")%>%
   mutate(Treatment = as.factor(Treatment), 
          Treatment = fct_relevel(Treatment, "Control", "25C", "30C"),
-         Event = as.factor(Event),
          Measurement = as.factor(Measurement))
 
-fitDist(Fv_Fm_av, data = pam_timeseries2, type = "realAll", try.gamlss = T)
+fitDist(Fv_Fm_av, data = pam_short_timeseries, type = "realAll", try.gamlss = T)
 
-#Best fit:generalized Gamma Lopatatsidis-Green (GG)
+#Best fit: generalized Gamma Lopatatsidis-Green (GG)
 
 histDist(pam_timeseries$Fv_Fm_av, "GG", density = F, main = "generalised Gamma Lopatatsidis-Green")
-pam_mod <- gamlss(Fv_Fm_av ~ Treatment*Measurement, data = pam_timeseries2, family = GG(), control = gamlss.control(n.cyc = 200))
+
+pam_mod2 <- gamlss(Fv_Fm_av ~ Treatment*Measurement, data = pam_short_timeseries, family = GG(), control = gamlss.control(n.cyc = 200))
 
 
-summary(pam_mod)
+summary(pam_mod2)
 ```
-
-
-
-```{r}
-#Kruskal-Wallis for each day: 
-pam_nov1 <- pam_clean %>%
-filter(Measurement == "T1")
-kruskal.test(Fv_Fm_av ~ Treatment, data = pam_nov1)
-
-pam_nov6am <- pam_clean %>%
-filter(Measurement == "T2")
-kruskal.test(Fv_Fm_av ~ Treatment, data = pam_nov6am)
-
-pam_nov6pm <- pam_clean %>%
-filter(Measurement == "T3")
-kruskal.test(Fv_Fm_av ~ Treatment, data = pam_nov6pm)
-
-pam_nov7pm <- pam_clean %>%
-filter(Measurement == "T5")
-kruskal.test(Fv_Fm_av ~ Treatment, data = pam_nov7pm)
-
-pam_nov8am <- pam_clean %>%
-filter(Measurement == "T6")
-kruskal.test(Fv_Fm_av ~ Treatment, data = pam_nov8am)
-
-pam_nov8pm <- pam_clean %>%
-filter(Measurement == "T7")
-kruskal.test(Fv_Fm_av ~ Treatment, data = pam_nov8pm)
-
-pam_nov9 <- pam_clean %>%
-filter(Measurement == "T8")
-kruskal.test(Fv_Fm_av ~ Treatment, data = pam_nov9)
-
-pam_nov13 <- pam_clean %>%
-filter(Measurement == "T9")
-kruskal.test(Fv_Fm_av ~ Treatment, data = pam_nov13)
-
-
-```
-
 
 # Base measurements
-
+## Plots
 ```{r}
-base_summary <- base_clean%>%
-  group_by(Date, Treatment)%>%
-  summarize(mean_base = mean(Average_Diameter), se_base = standard_error(Average_Diameter))
-
 ggplot(base_clean, aes(fill = Treatment, x=Date, y = Average_Diameter)) + 
         theme_classic() +
-         geom_boxplot() 
-
+         geom_boxplot() +
+labs(x = "Date", Y = "Base diameter (mm)") +
+  scale_fill_manual(values = c('#89226AFF',
+                              '#2C728EFF',    
+                              '#E65154FF')) +
+  theme(axis.text=element_text(size=15),
+        axis.title=element_text(size=20), 
+        legend.text=element_text(size=15), 
+        legend.title=element_text(size=20))
+ggsave("base_boxplot.png", width = 10, height = 7)
 ```
+
+## Testing distributions
+
 ```{r}
-#Testing distribution for base data:
+shapiro_test(base_clean$Average_Diameter)
+#Data is non-normal
 
-fitDist(Average_Diameter, data = base_clean, type = "realplus", try.gamlss = T)
+base_clean <- base_clean %>%
+  mutate(log_diameter = log(Average_Diameter))
+shapiro_test(base_clean$log_diameter)
+#Log transformed data is normal
 
-#LNO (box-cox) found to be the best fit
+bartlett.test(log_diameter ~ Treatment, data = base_clean)
+#Log transformed data has equal variances
 
-histDist(base_clean$Average_Diameter, "LNO", density = F, main = "LNO")
+base_clean %>%
+  group_by(Date, Treatment) %>%
+  identify_outliers(log_diameter)
+#One extreme outlier
+```
+
+
+```{r}
+base_aov <- anova_test(data = base_clean, dv = Average_Diameter, wid = Anemone_ID, within = c(Date,Treatment))
 ```
 
 # Feeding time
-
+## Plots
 ```{r}
-food_summary <- food%>%
-  group_by(Date, Treatment)%>%
-  summarize(mean_time = mean(Feeding_Time_Min), se_time = standard_error(Feeding_Time_Min))
+#Line graph of feeding time
 ggplot(data = food_summary, aes(x=Date, y = mean_time, group = Treatment, colour = Treatment)) + 
         theme_classic() +
          geom_point() +
         geom_line() +
         geom_errorbar(aes(ymin = mean_time- se_time, ymax = mean_time + se_time), width=0.2)
 
+#Boxplot of feeding time
 ggplot(food, aes(fill = Treatment, x=Date, y = Feeding_Time_Min)) + 
         theme_classic() +
-         geom_boxplot() 
-      
-
+         geom_boxplot() +
+  labs(x = "Date", Y = "Feeding time (min)") +
+  scale_fill_manual(values = c('#89226AFF',
+                              '#2C728EFF',    
+                              '#E65154FF')) +
+  theme(axis.text=element_text(size=15),
+        axis.title=element_text(size=20), 
+        legend.text=element_text(size=15), 
+        legend.title=element_text(size=20))
+ggsave("food_boxplot.png", width = 10, height = 7)
 ```
+#Testing distributions
 ```{r}
-#Testing distribution for base data:
+shapiro.test(food$Feeding_Time_Min)
+#Data is non-normal
 
+food <- food %>%
+  mutate(log_Feeding_Time_Min = log(Feeding_Time_Min))
+shapiro_test(food$log_Feeding_Time_Min)
+#Log transformed data fits normal distribution
 
-fitDist(Feeding_Time_Min, data = food, type = "realplus", try.gamlss = T)
+bartlett.test(log_Feeding_Time_Min ~ Treatment, data = food)
+#Log transformed data has equal variances
 
-#LNO (box-cox) found to be the best fit
+food %>%
+  group_by(Date, Treatment) %>%
+  identify_outliers(log_Feeding_Time_Min)
+#Log transformed data has no extreme outliers
+```
 
-histDist(food$Feeding_Time_Min, "LNO", density = F, main = "LNO")
+## ANOVA
+```{r}
+food_aov <- anova_test(data = food, dv = log_Feeding_Time_Min, wid = Anemone_ID, within = c(Treatment, Date))
 ```
 

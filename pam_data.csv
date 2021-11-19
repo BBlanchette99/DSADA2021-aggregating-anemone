@@ -1,0 +1,466 @@
+﻿Date,Measurement,Time,Event,Site,Treatment,Bin,Anemone_ID,Fv_Fm_1,Fv_Fm_2,Fv_Fm_3,Fv_Fm_av
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,25C,A,A25F,0.496,NA,NA,0.496
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,25C,B,A15F,0.581,NA,NA,0.581
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,25C,B,A6F,0.588,NA,NA,0.588
+10-25-2021 06:00:00,NA,Morning,Acclimation,Scotts,25C,B,A42S,0.515,NA,NA,0.515
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,25C,D,A13F,0.387,NA,NA,0.387
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,25C,D,A16F,0.492,NA,NA,0.492
+10-25-2021 06:00:00,NA,Morning,Acclimation,Scotts,25C,D,A41S,0.441,NA,NA,0.441
+10-25-2021 06:00:00,NA,Morning,Acclimation,Scotts,25C,E,A35S,0.407,NA,NA,0.407
+10-25-2021 06:00:00,NA,Morning,Acclimation,Scotts,25C,E,A28S,0.423,NA,NA,0.423
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,30C,F,A4F ,0.566,NA,NA,0.566
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,30C,F,A26F,0.313,NA,NA,0.313
+10-25-2021 06:00:00,NA,Morning,Acclimation,Scotts,30C,F,A34S,0.519,NA,NA,0.519
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,30C,G,A14F,0.461,NA,NA,0.461
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,30C,H,A22F,0.564,NA,NA,0.564
+10-25-2021 06:00:00,NA,Morning,Acclimation,Scotts,30C,H,A37S,0.528,NA,NA,0.528
+10-25-2021 06:00:00,NA,Morning,Acclimation,Scotts,30C,I,A38S,0.321,NA,NA,0.321
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,30C,J,A5F,0.457,NA,NA,0.457
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,30C,J,A23F,0.464,NA,NA,0.464
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,30C,J,A1F,0.243,NA,NA,0.243
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,Control,K,A19F,0.584,NA,NA,0.584
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,Control,K,A18F,0.565,NA,NA,0.565
+10-25-2021 06:00:00,NA,Morning,Acclimation,Scotts,Control,K,A39S,0.5,NA,NA,0.5
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,Control,L,A3F,0.527,NA,NA,0.527
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,Control,L,A12F,0.564,NA,NA,0.564
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,Control,M,A24F,0.579,NA,NA,0.579
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,Control,N,A10F,0.532,NA,NA,0.532
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,Control,N,A2F,0.548,NA,NA,0.548
+10-25-2021 06:00:00,NA,Morning,Acclimation,Foreshore,Control,O,A21F,0.56,NA,NA,0.56
+10-25-2021 06:00:00,NA,Morning,Acclimation,Scotts,Control,O,A27S,0.506,NA,NA,0.506
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,25C,A,A25F,0.49,NA,NA,0.49
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,25C,B,A15F,0.52,NA,NA,0.52
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,25C,B,A6F,0.54,NA,NA,0.54
+10-28-2021 06:00:00,NA,Morning,Acclimation,Scotts,25C,B,A42S,0.43,NA,NA,0.43
+10-28-2021 06:00:00,NA,Morning,Acclimation,Scotts,25C,C,A30S,0.23,NA,NA,0.23
+10-28-2021 06:00:00,NA,Morning,Acclimation,Scotts,25C,D,A41S,0.17,NA,NA,0.17
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,25C,D,A16F,0.56,NA,NA,0.56
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,25C,D,A13F,0.42,NA,NA,0.42
+10-28-2021 06:00:00,NA,Morning,Acclimation,Scotts,25C,E,A28S,0.44,NA,NA,0.44
+10-28-2021 06:00:00,NA,Morning,Acclimation,Scotts,25C,E,A35S,0.46,NA,NA,0.46
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,30C,F,A26F,0.08,NA,NA,0.08
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,30C,F,A4F,0.46,NA,NA,0.46
+10-28-2021 06:00:00,NA,Morning,Acclimation,Scotts,30C,F,A34S,0.19,NA,NA,0.19
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,30C,G,A14F,0.55,NA,NA,0.55
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,30C,H,A22F,0.56,NA,NA,0.56
+10-28-2021 06:00:00,NA,Morning,Acclimation,Scotts,30C,I,A38S,0.49,NA,NA,0.49
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,30C,J,A23F,0.58,NA,NA,0.58
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,30C,J,A5F,0.46,NA,NA,0.46
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,30C,J,A1F,0.47,NA,NA,0.47
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,Control,K,A19F,0.58,NA,NA,0.58
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,Control,K,A18F,0.55,NA,NA,0.55
+10-28-2021 06:00:00,NA,Morning,Acclimation,Scotts,Control,K,A39S,0.34,NA,NA,0.34
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,Control,L,A12F,0.56,NA,NA,0.56
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,Control,L,A3F,0.31,NA,NA,0.31
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,Control,M,A24F,0.57,NA,NA,0.57
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,Control,N,A10F,0.54,NA,NA,0.54
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,Control,N,A10F,0.58,NA,NA,0.58
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,Control,N,A2F,0.56,NA,NA,0.56
+10-28-2021 06:00:00,NA,Morning,Acclimation,Scotts,Control,N,A29S,0.47,NA,NA,0.47
+10-28-2021 06:00:00,NA,Morning,Acclimation,Scotts,Control,O,A27S,0.34,NA,NA,0.34
+10-28-2021 06:00:00,NA,Morning,Acclimation,Foreshore,Control,O,A21F,0.5,NA,NA,0.5
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,25C,A,A25F,0.509,0.537,0.552,0.533
+11-01-2021 06:00:00,T1,Morning,Acclimation,Bluestone,25C,A,A47B,0.427,0.459,0.433,0.44
+11-01-2021 06:00:00,T1,Morning,Acclimation,Bluestone,25C,A,A55B,0.458,0.473,0.432,0.454
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,25C,B,A15F,0.531,0.518,0.567,0.539
+11-01-2021 06:00:00,T1,Morning,Acclimation,Scotts,25C,B,A42S,0.529,0.508,0.534,0.524
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,25C,B,A6F,0.584,0.556,0.565,0.568
+11-01-2021 06:00:00,T1,Morning,Acclimation,Scotts,25C,C,A30S,0.537,0.506,0.548,0.53
+11-01-2021 06:00:00,T1,Morning,Acclimation,Bluestone,25C,C,A44B,0.58,0.571,0.566,0.572
+11-01-2021 06:00:00,T1,Morning,Acclimation,Bluestone,25C,C,A46B,0.539,0.551,0.547,0.546
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,25C,D,A13F,0.499,0.523,0.558,0.527
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,25C,D,A16F,0.595,0.493,0.578,0.555
+11-01-2021 06:00:00,T1,Morning,Acclimation,Scotts,25C,D,A41S,0.507,0.538,0.516,0.52
+11-01-2021 06:00:00,T1,Morning,Acclimation,Scotts,25C,E,A28S,0.476,0.549,0.457,0.494
+11-01-2021 06:00:00,T1,Morning,Acclimation,Scotts,25C,E,A35S,0.552,0.457,0.533,0.514
+11-01-2021 06:00:00,T1,Morning,Acclimation,Bluestone,25C,E,A49B,0.588,0.537,0.579,0.568
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,30C,F,A26F,0.455,0.57,0.563,0.529
+11-01-2021 06:00:00,T1,Morning,Acclimation,Scotts,30C,F,A34S,0.52,0.501,0.506,0.509
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,30C,F,A4F,0.551,0.578,0.53,0.553
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,30C,G,A14F,0.547,0.531,0.572,0.55
+11-01-2021 06:00:00,T1,Morning,Acclimation,Bluestone,30C,G,A45B,0.433,0.464,0.485,0.461
+11-01-2021 06:00:00,T1,Morning,Acclimation,Bluestone,30C,G,A56B,0.495,0.498,0.522,0.505
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,30C,H,A22F,0.515,0.472,0.557,0.515
+11-01-2021 06:00:00,T1,Morning,Acclimation,Scotts,30C,H,A37S,0.544,0.536,0.495,0.525
+11-01-2021 06:00:00,T1,Morning,Acclimation,Bluestone,30C,H,A51B,0.405,0.388,0.221,0.338
+11-01-2021 06:00:00,T1,Morning,Acclimation,Scotts,30C,I,A38S,0.506,0.435,0.55,0.497
+11-01-2021 06:00:00,T1,Morning,Acclimation,Bluestone,30C,I,A50B,0.443,0.519,0.517,0.493
+11-01-2021 06:00:00,T1,Morning,Acclimation,Bluestone,30C,I,A60B,0.365,0.363,0.383,0.37
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,30C,J,A1F,0.529,0.582,0.555,0.555
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,30C,J,A23F,0.549,0.553,0.547,0.55
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,30C,J,A5F,0.651,0.548,0.45,0.55
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,Control,K,A18F,0.576,0.539,0.581,0.565
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,Control,K,A19F,0.579,0.597,0.595,0.59
+11-01-2021 06:00:00,T1,Morning,Acclimation,Scotts,Control,K,A39S,0.539,0.52,NA,0.53
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,Control,L,A12F,0.66,0.583,0.476,0.573
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,Control,L,A3F,0.485,0.498,0.563,0.515
+11-01-2021 06:00:00,T1,Morning,Acclimation,Bluestone,Control,L,A57B,0.534,0.489,0.516,0.513
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,Control,M,A24F,0.577,0.554,0.572,0.568
+11-01-2021 06:00:00,T1,Morning,Acclimation,Bluestone,Control,M,A43B,0.459,0.423,0.448,0.443
+11-01-2021 06:00:00,T1,Morning,Acclimation,Bluestone,Control,M,A59B,0.268,0.236,0.235,0.246
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,Control,N,A10F,0.573,0.569,0.57,0.571
+11-01-2021 06:00:00,T1,Morning,Acclimation,Scotts,Control,N,A29S,0.502,0.487,0.469,0.486
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,Control,N,A2F,0.507,0.516,0.523,0.515
+11-01-2021 06:00:00,T1,Morning,Acclimation,Foreshore,Control,O,A21F,0.557,0.578,0.564,0.566
+11-01-2021 06:00:00,T1,Morning,Acclimation,Scotts,Control,O,A27S,0.476,0.494,0.523,0.498
+11-01-2021 06:00:00,T1,Morning,Acclimation,Bluestone,Control,O,A54B,0.522,0.559,0.555,0.545
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,25C,A,A25F,0.525,0.55,0.56,0.545
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Bluestone,25C,A,A47B,0.481,0.505,0.56,0.515
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Bluestone,25C,A,A55B,0.495,0.525,0.518,0.513
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,25C,B,A15F,0.524,0.538,0.556,0.539
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Scotts,25C,B,A42S,0.503,0.521,0.668,0.564
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,25C,B,A6F,0.554,0.557,0.594,0.568
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Scotts,25C,C,A30S,0.52,0.549,0.459,0.509
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Bluestone,25C,C,A44B,0.531,0.545,0.542,0.539
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Bluestone,25C,C,A46B,0.504,0.506,0.564,0.525
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,25C,D,A13F,0.544,0.537,0.536,0.539
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,25C,D,A16F,0.523,0.527,0.576,0.542
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Scotts,25C,D,A41S,0.565,0.532,0.576,0.558
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Scotts,25C,E,A28S,0.537,0.502,NA,0.52
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Scotts,25C,E,A35S,0.417,0.411,0.471,0.433
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Bluestone,25C,E,A49B,0.452,0.486,0.497,0.478
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,30C,F,A26F,0.54,0.545,0.539,0.541
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Scotts,30C,F,A34S,0.506,0.482,0.484,0.491
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,30C,F,A4F,0.466,0.516,0.505,0.496
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,30C,G,A14F,0.459,0.477,0.48,0.472
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Bluestone,30C,G,A45B,0.49,0.452,0.513,0.485
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Bluestone,30C,G,A56B,0.382,0.382,0.404,0.389
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,30C,H,A22F,0.517,0.496,0.466,0.493
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Scotts,30C,H,A37S,0.508,0.522,0.488,0.506
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Bluestone,30C,H,A51B,0.483,0.484,0.464,0.477
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Scotts,30C,I,A38S,0.476,0.346,0.433,0.418
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Bluestone,30C,I,A50B,0.457,0.491,0.45,0.466
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Bluestone,30C,I,A60B,0.42,0.404,0.386,0.403
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,30C,J,A1F,0.516,0.49,0.475,0.494
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,30C,J,A23F,0.384,0.512,0.427,0.441
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,30C,J,A5F,0.503,0.444,0.314,0.42
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,Control,K,A18F,0.509,0.528,0.525,0.521
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,Control,K,A19F,0.504,0.519,0.551,0.525
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Scotts,Control,K,A39S,0.486,0.539,0.551,0.525
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,Control,L,A12F,0.54,0.518,0.508,0.522
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,Control,L,A3F,0.443,0.475,0.447,0.455
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Bluestone,Control,L,A57B,0.494,0.503,0.524,0.507
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,Control,M,A24F,0.537,0.552,0.5,0.53
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Bluestone,Control,M,A43B,0.449,0.425,0.457,0.444
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Bluestone,Control,M,A59B,0.365,0.421,0.441,0.409
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,Control,N,A10F,0.549,0.45,0.512,0.504
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Scotts,Control,N,A29S,0.443,0.439,0.433,0.438
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,Control,N,A2F,0.539,0.486,0.54,0.522
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Foreshore,Control,O,A21F,0.496,0.556,0.601,0.551
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Scotts,Control,O,A27S,0.403,0.453,0.413,0.423
+11-06-2021 06:00:00,T2,Morning,Pre-heat,Bluestone,Control,O,A54B,0.517,0.492,0.489,0.499
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,25C,A,A25F,0.6,0.584,0.608,0.597
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Bluestone,25C,A,A47B,0.6,0.645,0.558,0.601
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Bluestone,25C,A,A55B,0.573,0.515,0.555,0.548
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,25C,B,A15F,0.603,0.601,0.586,0.597
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Scotts,25C,B,A42S,0.565,0.567,0.451,0.528
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,25C,B,A6F,0.525,0.613,0.585,0.574
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Scotts,25C,C,A30S,0.551,0.528,0.546,0.542
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Bluestone,25C,C,A44B,0.565,0.457,0.589,0.537
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Bluestone,25C,C,A46B,0.589,0.49,0.606,0.562
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,25C,D,A13F,0.612,0.589,0.58,0.594
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,25C,D,A16F,0.568,0.574,0.559,0.567
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Scotts,25C,D,A41S,0.518,0.585,0.54,0.548
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Scotts,25C,E,A28S,0.543,0.538,,0.541
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Scotts,25C,E,A35S,0.543,0.582,0.512,0.546
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Bluestone,25C,E,A49B,0.531,0.501,0.571,0.534
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,30C,F,A26F,0.198,0.429,0.451,0.359
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Scotts,30C,F,A34S,0.483,0.453,0.46,0.465
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,30C,F,A4F,0.522,0.473,0.139,0.378
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,30C,G,A14F,0.431,0.286,0.446,0.388
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Bluestone,30C,G,A45B,0.388,0.4,0.456,0.415
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Bluestone,30C,G,A56B,0.446,0.179,0.392,0.339
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,30C,H,A22F,0.576,0.534,0.482,0.531
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Scotts,30C,H,A37S,0.477,0.536,0.333,0.449
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Bluestone,30C,H,A51B,0.474,0.539,0.453,0.489
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Scotts,30C,I,A38S,0.257,0.497,0.474,0.409
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Bluestone,30C,I,A50B,0.477,0.384,0.464,0.442
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Bluestone,30C,I,A60B,0.506,0.424,0.362,0.431
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,30C,J,A1F,0.359,0.46,0.322,0.38
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,30C,J,A23F,0.433,0.273,0.429,0.378
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,30C,J,A5F,0.461,0.444,0.396,0.434
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,Control,K,A18F,0.539,0.39,0.552,0.494
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,Control,K,A19F,0.535,0.536,0.548,0.54
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Scotts,Control,K,A39S,0.462,0.341,NA,0.402
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,Control,L,A12F,0.496,0.578,0.531,0.535
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,Control,L,A3F,0.536,0.478,0.501,0.505
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Bluestone,Control,L,A57B,0.402,0.469,0.469,0.447
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,Control,M,A24F,0.501,0.477,0.54,0.506
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Bluestone,Control,M,A43B,0.485,0.346,0.116,0.316
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Bluestone,Control,M,A59B,0.473,0.451,0.48,0.468
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,Control,N,A10F,0.494,0.517,0.484,0.498
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Scotts,Control,N,A29S,0.456,0.408,0.392,0.419
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,Control,N,A2F,0.569,0.542,0.579,0.563
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Foreshore,Control,O,A21F,0.566,0.524,0.571,0.554
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Scotts,Control,O,A27S,0.373,0.499,0.51,0.461
+11-06-2021 16:00:00,T3,Afternoon,Post-heat,Bluestone,Control,O,A54B,0.521,0.492,0.496,0.503
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,25C,A,A25F,0.506,0.49,0.513,0.503
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Bluestone,25C,A,A47B,0.538,0.53,0.493,0.52
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Bluestone,25C,A,A55B,0.451,0.51,0.526,0.496
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,25C,B,A15F,0.557,0.573,0.578,0.569
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Scotts,25C,B,A42S,0.43,0.532,0.507,0.49
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,25C,B,A6F,0.472,0.542,0.574,0.529
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Scotts,25C,C,A30S,0.561,0.545,0.539,0.548
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Bluestone,25C,C,A44B,0.484,0.528,0.555,0.522
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Bluestone,25C,C,A46B,0.563,0.53,0.536,0.543
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,25C,D,A13F,0.526,0.563,0.585,0.558
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,25C,D,A16F,0.59,0.555,0.561,0.569
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Scotts,25C,D,A41S,0.486,0.575,0.552,0.538
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Scotts,25C,E,A28S,0.439,0.539,NA,0.489
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Scotts,25C,E,A35S,0.475,0.527,0.514,0.505
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Bluestone,25C,E,A49B,0.521,0.517,0.541,0.526
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,30C,F,A26F,0.083,0.052,0.155,0.097
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Scotts,30C,F,A34S,0.105,0.155,0.097,0.119
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,30C,F,A4F,0.197,0.143,0.152,0.164
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,30C,G,A14F,0.136,0.184,0.202,0.174
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Bluestone,30C,G,A45B,0.071,0.088,0.142,0.1
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Bluestone,30C,G,A56B,0.093,0.094,0.134,0.107
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,30C,H,A22F,0.087,0.098,0.087,0.091
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Scotts,30C,H,A37S,0.158,0.19,0.185,0.178
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Bluestone,30C,H,A51B,0.109,0.132,0.167,0.136
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Scotts,30C,I,A38S,0.073,0.112,0.133,0.106
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Bluestone,30C,I,A50B,0.118,0.161,0.127,0.135
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Bluestone,30C,I,A60B,0.089,0.108,0.11,0.102
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,30C,J,A1F,0.55,0.507,0.528,0.528
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,30C,J,A23F,0.532,0.522,0.451,0.502
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,30C,J,A5F,0.529,0.494,0.497,0.507
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,Control,K,A18F,0.54,0.561,0.561,0.554
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,Control,K,A19F,0.556,0.595,0.593,0.581
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Scotts,Control,K,A39S,0.489,0.512,0.535,0.512
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,Control,L,A12F,0.544,0.573,0.586,0.568
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,Control,L,A3F,0.563,0.559,0.557,0.56
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Bluestone,Control,L,A57B,0.51,0.543,0.534,0.529
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,Control,M,A24F,0.566,0.556,0.575,0.566
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Bluestone,Control,M,A43B,0.483,0.502,0.489,0.491
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Bluestone,Control,M,A59B,0.328,0.525,0.407,0.42
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,Control,N,A10F,0.406,0.572,0.581,0.52
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Scotts,Control,N,A29S,0.447,0.518,0.516,0.494
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,Control,N,A2F,0.536,0.504,0.583,0.541
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Foreshore,Control,O,A21F,0.558,0.528,0.566,0.551
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Scotts,Control,O,A27S,0.406,0.444,0.594,0.481
+11-07-2021 06:00:00,NA,Morning,Pre-heat,Bluestone,Control,O,A54B,0.508,0.51,0.515,0.511
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,25C,A,A25F,0.573,0.593,0.578,0.581
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Bluestone,25C,A,A47B,0.566,0.596,0.573,0.578
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Bluestone,25C,A,A55B,0.569,0.572,0.55,0.564
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,25C,B,A15F,0.592,0.596,0.58,0.589
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Scotts,25C,B,A42S,0.546,0.575,0.485,0.535
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,25C,B,A6F,0.594,0.594,0.529,0.572
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Scotts,25C,C,A30S,0.603,0.639,0.503,0.582
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Bluestone,25C,C,A44B,0.564,0.573,0.619,0.585
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Bluestone,25C,C,A46B,0.575,0.609,0.591,0.592
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,25C,D,A13F,0.622,0.611,0.599,0.611
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,25C,D,A16F,0.562,0.577,0.568,0.569
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Scotts,25C,D,A41S,0.597,0.514,0.512,0.541
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Scotts,25C,E,A28S,0.542,0.523,0.464,0.51
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Scotts,25C,E,A35S,0.546,0.582,0.566,0.565
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Bluestone,25C,E,A49B,0.538,0.516,0.563,0.539
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,30C,F,A26F,0.58,0.603,0.574,0.586
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Scotts,30C,F,A34S,0.582,0.525,0.579,0.562
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,30C,F,A4F,0.481,0.601,0.604,0.562
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,30C,G,A14F,0.56,0.579,0.614,0.584
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Bluestone,30C,G,A45B,0.571,0.613,0.599,0.594
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Bluestone,30C,G,A56B,0.459,0.491,0.567,0.506
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,30C,H,A22F,0.585,0.562,0.571,0.573
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Scotts,30C,H,A37S,0.242,0.405,0.412,0.353
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Bluestone,30C,H,A51B,0.64,0.538,0.492,0.557
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Scotts,30C,I,A38S,0.559,0.528,0.456,0.514
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Bluestone,30C,I,A50B,0.501,0.559,0.55,0.537
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Bluestone,30C,I,A60B,0.407,0.53,0.411,0.449
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,30C,J,A1F,0.545,0.575,0.562,0.561
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,30C,J,A23F,0.589,0.64,0.612,0.614
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,30C,J,A5F,0.641,0.475,0.533,0.55
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,Control,K,A18F,0.531,0.57,0.527,0.543
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,Control,K,A19F,0.607,0.624,0.59,0.607
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Scotts,Control,K,A39S,0.584,0.568,0.515,0.556
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,Control,L,A12F,0.593,0.631,0.611,0.612
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,Control,L,A3F,0.647,0.562,0.601,0.603
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Bluestone,Control,L,A57B,0.585,0.581,0.555,0.574
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,Control,M,A24F,0.614,0.618,0.538,0.59
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Bluestone,Control,M,A43B,0.387,0.486,0.496,0.456
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Bluestone,Control,M,A59B,0.514,0.548,0.52,0.527
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,Control,N,A10F,0.532,0.612,0.632,0.592
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Scotts,Control,N,A29S,0.595,0.516,0.569,0.56
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,Control,N,A2F,0.584,0.659,0.607,0.617
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Foreshore,Control,O,A21F,0.61,0.577,0.597,0.595
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Scotts,Control,O,A27S,0.422,0.496,,0.459
+11-07-2021 16:00:00,T5,Afternoon,Post-heat,Bluestone,Control,O,A54B,0.534,0.5,0.543,0.526
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,25C,A,A25F,0.621,0.514,0.539,0.558
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Bluestone,25C,A,A47B,0.555,0.6,0.611,0.589
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Bluestone,25C,A,A55B,0.545,0.468,0.479,0.497
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,25C,B,A15F,0.612,0.635,0.602,0.616
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Scotts,25C,B,A42S,0.515,0.538,0.565,0.539
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,25C,B,A6F,0.621,0.571,0.59,0.594
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Scotts,25C,C,A30S,0.511,0.596,0.584,0.564
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Bluestone,25C,C,A44B,0.571,0.621,0.627,0.606
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Bluestone,25C,C,A46B,0.592,0.554,0.585,0.577
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,25C,D,A13F,0.47,0.6,0.548,0.539
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,25C,D,A16F,0.576,0.575,0.573,0.575
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Scotts,25C,D,A41S,0.586,0.548,0.404,0.513
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Scotts,25C,E,A28S,0.571,0.548,0.333,0.484
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Scotts,25C,E,A35S,0.525,0.619,0.51,0.551
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Bluestone,25C,E,A49B,0.558,0.589,0.595,0.581
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,30C,F,A26F,0.592,0.586,0.616,0.598
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Scotts,30C,F,A34S,0.528,0.592,0.553,0.558
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,30C,F,A4F,0.574,0.586,0.523,0.561
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,30C,G,A14F,0.584,0.553,0.577,0.571
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Bluestone,30C,G,A45B,0.552,0.534,0.565,0.55
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Bluestone,30C,G,A56B,0.528,0.584,0.531,0.548
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,30C,H,A22F,0.323,0.581,0.59,0.498
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Scotts,30C,H,A37S,0.605,0.577,0.555,0.579
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Bluestone,30C,H,A51B,0.601,0.569,0.511,0.56
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Scotts,30C,I,A38S,0.56,0.61,0.583,0.584
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Bluestone,30C,I,A50B,0.555,0.566,0.571,0.564
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Bluestone,30C,I,A60B,0.431,0.514,0.527,0.491
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,30C,J,A1F,0.576,0.552,0.575,0.568
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,30C,J,A23F,0.602,0.601,0.574,0.592
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,30C,J,A5F,0.057,0.481,0.51,0.349
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,Control,K,A18F,0.556,0.636,0.613,0.602
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,Control,K,A19F,0.563,0.6,0.615,0.593
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Scotts,Control,K,A39S,0.559,0.584,0.555,0.566
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,Control,L,A12F,0.621,0.579,0.613,0.604
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,Control,L,A3F,0.501,0.61,0.588,0.566
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Bluestone,Control,L,A57B,0.522,0.58,0.549,0.55
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,Control,M,A24F,0.618,0.588,0.58,0.595
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Bluestone,Control,M,A43B,0.353,0.544,0.538,0.478
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Bluestone,Control,M,A59B,0.526,0.545,0.488,0.52
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,Control,N,A10F,0.577,0.595,0.6,0.591
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Scotts,Control,N,A29S,0.551,0.463,0.568,0.527
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,Control,N,A2F,0.597,0.588,0.616,0.6
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Foreshore,Control,O,A21F,0.552,0.624,0.612,0.596
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Scotts,Control,O,A27S,0.534,0.537,0.595,0.555
+11-08-2021 06:00:00,T6,Morning,Pre-heat,Bluestone,Control,O,A54B,0.583,0.573,0.553,0.57
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,25C,A,A25F,0.522,0.532,0.565,0.54
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Bluestone,25C,A,A47B,0.475,0.512,0.528,0.505
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Bluestone,25C,A,A55B,0.477,0.495,0.559,0.51
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,25C,B,A15F,0.521,0.571,0.56,0.551
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Scotts,25C,B,A42S,0.534,0.493,0.552,0.526
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,25C,B,A6F,0.602,0.584,,0.593
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Scotts,25C,C,A30S,0.518,0.49,0.575,0.528
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Bluestone,25C,C,A44B,0.51,0.497,0.514,0.507
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Bluestone,25C,C,A46B,0.477,0.506,0.556,0.513
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,25C,D,A13F,0.591,0.555,0.611,0.586
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,25C,D,A16F,0.554,0.545,0.538,0.546
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Scotts,25C,D,A41S,0.544,0.484,0.549,0.526
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Scotts,25C,E,A28S,0.544,0.547,0.489,0.527
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Scotts,25C,E,A35S,0.487,0.459,0.466,0.471
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Bluestone,25C,E,A49B,0.494,0.569,0.504,0.522
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,30C,F,A26F,0.478,0.541,0.544,0.521
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Scotts,30C,F,A34S,0.554,0.527,0.553,0.545
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,30C,F,A4F,0.457,0.593,0.557,0.536
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,30C,G,A14F,0.493,0.488,0.53,0.504
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Bluestone,30C,G,A45B,0.494,0.478,0.346,0.439
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Bluestone,30C,G,A56B,0.453,0.416,0.463,0.444
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,30C,H,A22F,0.501,0.553,0.544,0.533
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Scotts,30C,H,A37S,0.546,0.547,0.55,0.548
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Bluestone,30C,H,A51B,0.417,0.425,0.498,0.447
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Scotts,30C,I,A38S,0.328,0.372,0.418,0.373
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Bluestone,30C,I,A50B,0.478,0.521,0.538,0.512
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Bluestone,30C,I,A60B,0.462,0.436,0.409,0.436
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,30C,J,A1F,0.548,0.544,0.43,0.507
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,30C,J,A23F,0.485,0.465,0.538,0.496
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,30C,J,A5F,0.262,0.286,0.464,0.337
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,Control,K,A18F,0.536,0.545,0.577,0.553
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,Control,K,A19F,0.605,0.605,0.592,0.601
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Scotts,Control,K,A39S,0.466,0.449,0.402,0.439
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,Control,L,A12F,0.528,0.564,0.587,0.56
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,Control,L,A3F,0.441,0.51,0.545,0.499
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Bluestone,Control,L,A57B,0.567,0.571,0.547,0.562
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,Control,M,A24F,0.512,0.58,0.57,0.554
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Bluestone,Control,M,A43B,0.53,0.554,0.488,0.524
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Bluestone,Control,M,A59B,0.481,0.546,0.498,0.508
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,Control,N,A10F,0.583,0.59,,0.587
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Scotts,Control,N,A29S,0.49,0.56,0.455,0.502
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,Control,N,A2F,0.555,0.565,0.558,0.559
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Foreshore,Control,O,A21F,0.511,0.587,0.584,0.561
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Scotts,Control,O,A27S,0.58,0.581,0.573,0.578
+11-08-2021 16:00:00,T7,Afternoon,Post-heat,Bluestone,Control,O,A54B,0.533,0.539,0.508,0.527
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,25C,A,A25F,0.477,0.531,0.576,0.528
+11-09-2021 06:00:00,T8,Morning,Recovery ,Bluestone,25C,A,A47B,0.509,0.532,0.565,0.535
+11-09-2021 06:00:00,T8,Morning,Recovery ,Bluestone,25C,A,A55B,0.534,0.508,0.526,0.523
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,25C,B,A15F,0.578,0.596,0.61,0.595
+11-09-2021 06:00:00,T8,Morning,Recovery ,Scotts,25C,B,A42S,0.603,0.528,0.549,0.56
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,25C,B,A6F,0.603,0.615,0.583,0.6
+11-09-2021 06:00:00,T8,Morning,Recovery ,Scotts,25C,C,A30S,0.555,0.556,0.58,0.564
+11-09-2021 06:00:00,T8,Morning,Recovery ,Bluestone,25C,C,A44B,0.564,0.458,0.564,0.529
+11-09-2021 06:00:00,T8,Morning,Recovery ,Bluestone,25C,C,A46B,0.558,0.563,0.532,0.551
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,25C,D,A13F,0.583,0.627,0.596,0.602
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,25C,D,A16F,0.576,0.578,0.579,0.578
+11-09-2021 06:00:00,T8,Morning,Recovery ,Scotts,25C,D,A41S,0.574,0.58,0.548,0.567
+11-09-2021 06:00:00,T8,Morning,Recovery ,Scotts,25C,E,A28S,0.401,0.316,0.495,0.404
+11-09-2021 06:00:00,T8,Morning,Recovery ,Scotts,25C,E,A35S,0.559,0.549,0.575,0.561
+11-09-2021 06:00:00,T8,Morning,Recovery ,Bluestone,25C,E,A49B,0.559,0.57,0.537,0.555
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,30C,F,A26F,0.556,0.608,0.643,0.602
+11-09-2021 06:00:00,T8,Morning,Recovery ,Scotts,30C,F,A34S,0.584,0.595,0.522,0.567
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,30C,F,A4F,0.488,0.687,,0.588
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,30C,G,A14F,0.545,0.58,0.616,0.58
+11-09-2021 06:00:00,T8,Morning,Recovery ,Bluestone,30C,G,A45B,0.552,0.561,0.538,0.55
+11-09-2021 06:00:00,T8,Morning,Recovery ,Bluestone,30C,G,A56B,0.577,0.513,0.487,0.526
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,30C,H,A22F,0.593,0.631,0.569,0.598
+11-09-2021 06:00:00,T8,Morning,Recovery ,Scotts,30C,H,A37S,0.539,0.574,0.561,0.558
+11-09-2021 06:00:00,T8,Morning,Recovery ,Bluestone,30C,H,A51B,0.555,0.561,0.534,0.55
+11-09-2021 06:00:00,T8,Morning,Recovery ,Scotts,30C,I,A38S,0.542,0.488,0.544,0.525
+11-09-2021 06:00:00,T8,Morning,Recovery ,Bluestone,30C,I,A50B,0.518,0.546,0.53,0.531
+11-09-2021 06:00:00,T8,Morning,Recovery ,Bluestone,30C,I,A60B,0.586,0.517,0.51,0.538
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,30C,J,A1F,0.585,0.563,0.542,0.563
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,30C,J,A23F,0.601,0.599,0.602,0.601
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,30C,J,A5F,0.366,0.456,0.569,0.464
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,Control,K,A18F,0.605,0.58,0.591,0.592
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,Control,K,A19F,0.558,0.596,0.597,0.584
+11-09-2021 06:00:00,T8,Morning,Recovery ,Scotts,Control,K,A39S,0.457,0.586,0.536,0.526
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,Control,L,A12F,0.589,0.571,0.613,0.591
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,Control,L,A3F,0.526,0.544,0.389,0.486
+11-09-2021 06:00:00,T8,Morning,Recovery ,Bluestone,Control,L,A57B,0.581,0.569,0.689,0.613
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,Control,M,A24F,0.604,0.593,0.605,0.601
+11-09-2021 06:00:00,T8,Morning,Recovery ,Bluestone,Control,M,A43B,0.552,0.54,0.443,0.512
+11-09-2021 06:00:00,T8,Morning,Recovery ,Bluestone,Control,M,A59B,0.458,0.408,0.504,0.457
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,Control,N,A10F,0.594,0.608,0.538,0.58
+11-09-2021 06:00:00,T8,Morning,Recovery ,Scotts,Control,N,A29S,0.532,0.569,0.502,0.534
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,Control,N,A2F,0.567,0.609,0.607,0.594
+11-09-2021 06:00:00,T8,Morning,Recovery ,Foreshore,Control,O,A21F,0.522,0.613,0.592,0.576
+11-09-2021 06:00:00,T8,Morning,Recovery ,Scotts,Control,O,A27S,0.572,0.589,0.587,0.583
+11-09-2021 06:00:00,T8,Morning,Recovery ,Bluestone,Control,O,A54B,0.581,0.543,0.581,0.568
+11-13-2021 06:00:00,T9,Morning,Recovery ,Bluestone,25C,A,A55B,0.512,0.5,0.543,0.518
+11-13-2021 06:00:00,T9,Morning,Recovery ,Bluestone,25C,A,A47B,0.54,0.494,0.497,0.51
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,25C,A,A25F,0.47,0.565,0.54,0.525
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,25C,B,A6F,0.589,0.557,0.58,0.575
+11-13-2021 06:00:00,T9,Morning,Recovery ,Scotts,25C,B,A42S,0.473,0.522,0.548,0.514
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,25C,B,A15F,0.492,0.55,0.511,0.518
+11-13-2021 06:00:00,T9,Morning,Recovery ,Bluestone,25C,C,A46B,0.562,0.518,0.51,0.53
+11-13-2021 06:00:00,T9,Morning,Recovery ,Scotts,25C,C,A30S,0.45,0.508,0.537,0.498
+11-13-2021 06:00:00,T9,Morning,Recovery ,Bluestone,25C,C,A44B,0.541,0.498,0.526,0.522
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,25C,D,A13F,0.54,0.569,0.548,0.552
+11-13-2021 06:00:00,T9,Morning,Recovery ,Scotts,25C,D,A41S,0.578,0.537,0.529,0.548
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,25C,D,A16F,0.57,0.549,0.451,0.523
+11-13-2021 06:00:00,T9,Morning,Recovery ,Scotts,25C,E,A35S,0.521,0.525,0.596,0.547
+11-13-2021 06:00:00,T9,Morning,Recovery ,Bluestone,25C,E,A49B,0.526,0.542,0.579,0.549
+11-13-2021 06:00:00,T9,Morning,Recovery ,Scotts,25C,E,A28S,0.587,0.562,0.559,0.569
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,30C,F,A26F,0.541,0.564,0.559,0.555
+11-13-2021 06:00:00,T9,Morning,Recovery ,Scotts,30C,F,A34S,0.459,0.535,0.566,0.52
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,30C,F,A4F,0.529,0.386,0.516,0.477
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,30C,G,A14F,0.467,0.493,0.541,0.5
+11-13-2021 06:00:00,T9,Morning,Recovery ,Bluestone,30C,G,A45B,0.484,0.51,0.474,0.489
+11-13-2021 06:00:00,T9,Morning,Recovery ,Bluestone,30C,G,A56B,0.459,0.445,0.353,0.419
+11-13-2021 06:00:00,T9,Morning,Recovery ,Bluestone,30C,H,A51B,0.517,0.46,0.519,0.499
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,30C,H,A22F,0.476,0.57,0.547,0.531
+11-13-2021 06:00:00,T9,Morning,Recovery ,Scotts,30C,H,A37S,0.551,0.55,0.545,0.549
+11-13-2021 06:00:00,T9,Morning,Recovery ,Bluestone,30C,I,A60B,0.444,0.498,0.488,0.477
+11-13-2021 06:00:00,T9,Morning,Recovery ,Bluestone,30C,I,A50B,0.508,0.54,0.534,0.527
+11-13-2021 06:00:00,T9,Morning,Recovery ,Scotts,30C,I,A38S,0.399,0.514,0.577,0.497
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,30C,J,A23F,0.502,0.482,0.446,0.477
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,30C,J,A5F,0.49,0.556,,0.523
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,30C,J,A1F,0.519,0.518,0.54,0.526
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,Control,K,A19F,0.549,0.554,0.55,0.551
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,Control,K,A18F,0.507,0.524,0.543,0.525
+11-13-2021 06:00:00,T9,Morning,Recovery ,Scotts,Control,K,A39S,0.522,0.5,0.578,0.533
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,Control,L,A12F,0.491,0.503,0.581,0.525
+11-13-2021 06:00:00,T9,Morning,Recovery ,Bluestone,Control,L,A57B,0.555,0.525,0.575,0.552
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,Control,L,A3F,0.564,0.504,0.501,0.523
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,Control,M,A24F,0.568,0.593,0.559,0.573
+11-13-2021 06:00:00,T9,Morning,Recovery ,Bluestone,Control,M,A59B,0.472,0.487,0.491,0.483
+11-13-2021 06:00:00,T9,Morning,Recovery ,Bluestone,Control,M,A43B,0.434,0.381,0..463,0.408
+11-13-2021 06:00:00,T9,Morning,Recovery ,Scotts,Control,N,A29S,0.465,0.499,0.48,0.481
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,Control,N,A10F,0.586,0.594,0.592,0.591
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,Control,N,A2F,0.575,0.512,0.557,0.548
+11-13-2021 06:00:00,T9,Morning,Recovery ,Scotts,Control,O,A27S,0.524,0.562,,0.543
+11-13-2021 06:00:00,T9,Morning,Recovery ,Bluestone,Control,O,A54B,0.536,0.55,0.56,0.549
+11-13-2021 06:00:00,T9,Morning,Recovery ,Foreshore,Control,O,A21F,0.516,0.549,0.546,0.537
