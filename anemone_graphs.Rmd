@@ -25,7 +25,7 @@ library(tidyverse)
 pam<-read_delim("pam_data.csv", delim = ",")
 base <- read_delim("base_diameter_data.csv", delim = ",")
 food <- read_delim("feeding_time_data.csv", delim = ",")
-response <- read_delim("open_closed_data.csv", delim = ",")
+open_closed <- read_delim("open_closed_data.csv", delim = ",")
 ```
 # Cleaning data
 ```{r}
@@ -60,6 +60,16 @@ food_clean <- food%>%
 food_summary <- food%>%
   group_by(Date, Treatment)%>%
   summarize(mean_time = mean(Feeding_Time_Min), se_time = standard_error(Feeding_Time_Min))
+
+open_closed_clean <- open_closed %>%
+  select(Date, Time_Block, Anemone_ID,Treatment, Bin, Site, Open_Closed)%>%
+  mutate(Date = as.factor(Date), Site = as.factor(Site),Anemone_ID = as.factor(Anemone_ID),Treatment = as.factor(Treatment), Bin=as.factor(Bin), Open_Closed = as.factor(Open_Closed), Open_Closed = fct_relevel(Open_Closed, "Open", "Partially open", "Closed"), Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))
+
+open_closed_summary <- open_closed %>%
+ group_by(Date, Treatment, Time_Block)%>%
+  count(Open_Closed) %>%
+  mutate(Treatment = as.factor(Treatment),  Open_Closed = as.factor(Open_Closed), Open_Closed = fct_relevel(Open_Closed, "Open", "Partially open", "Closed"), Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))
+
 ```
 # PAM data
 ## Plots
@@ -332,5 +342,14 @@ food %>%
 ## ANOVA
 ```{r}
 food_aov <- anova_test(data = food, dv = log_Feeding_Time_Min, wid = Anemone_ID, within = c(Treatment, Date))
+```
+# Open/closed measurements
+## Plots
+```{r}
+ggplot(data = open_closed_summary, aes(x = Time_Block, y = n, fill = Open_Closed)) + 
+  geom_bar(position = "fill", stat = "identity") + 
+  facet_grid(.~Treatment) +
+  labs(x="Time (hours)", y = "Proportion") +
+  theme_classic()
 ```
 
