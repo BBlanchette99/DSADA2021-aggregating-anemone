@@ -15,6 +15,7 @@ library(mgcv)
 library(fitdistrplus)
 library(goft)
 library(gamlss)
+library(ordinal)
 library(car)
 library(performance)
 library(LambertW)
@@ -27,7 +28,9 @@ base <- read_delim("base_diameter_data.csv", delim = ",")
 food <- read_delim("feeding_time_data.csv", delim = ",")
 open_closed <- read_delim("open_closed_data.csv", delim = ",")
 ```
+
 # Cleaning data
+
 ```{r}
 #Function to calculate standard error for summarizing data
 standard_error <- function(x) sd(x) / sqrt(length(x))
@@ -66,13 +69,19 @@ open_closed_clean <- open_closed %>%
   mutate(Date = as.factor(Date), Site = as.factor(Site),Anemone_ID = as.factor(Anemone_ID),Treatment = as.factor(Treatment), Bin=as.factor(Bin), Open_Closed = as.factor(Open_Closed), Open_Closed = fct_relevel(Open_Closed, "Open", "Partially open", "Closed"), Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))
 
 open_closed_summary <- open_closed %>%
- group_by(Date, Treatment, Time_Block)%>%
+ group_by(Date, Treatment, Time_Block, Anemone_ID)%>%
   count(Open_Closed) %>%
-  mutate(Treatment = as.factor(Treatment),  Open_Closed = as.factor(Open_Closed), Open_Closed = fct_relevel(Open_Closed, "Open", "Partially open", "Closed"), Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))
+  mutate(Date = as.factor(Date), Treatment = as.factor(Treatment),  Open_Closed = as.factor(Open_Closed), Open_Closed = fct_relevel(Open_Closed, "Open", "Partially open", "Closed"), Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))
+
+open_closed_summary$Open_Closed = factor(open_closed_summary$Open_Closed, levels = c("Open", "Partially open", "Closed"), ordered = TRUE)
+open_closed_summary$Date = factor(open_closed_summary$Date, levels = c("11/6/2021", "11/7/2021", "11/8/2021"), ordered = TRUE)
 
 ```
+
 # PAM data
+
 ## Plots
+
 ```{r}
 #Line graph of PAM (morning vs afternoon during heatwave)
 
@@ -175,6 +184,7 @@ ggsave("pam_MorningAfternoon.png")
 ```
 
 ## Testing distributions
+
 ```{r}
 #Checking assumptions of PAM data
 #Outliers
@@ -205,7 +215,6 @@ shapiro.test(pam_clean$log_Fv_Fm)
 #P-values for all transformations are less than 0.05. Data are still not normally distributed. 
 ```
 
-
 ```{r}
 #Testing new distribution for PAM data
 
@@ -215,7 +224,9 @@ fitDist(Fv_Fm_av, data = pam_clean, type = "real0to1", try.gamlss = T)
 
 histDist(pam_clean$Fv_Fm_av, "GB1", density = F, main = "GB1")
 ```
+
 ## Gamlss model
+
 ```{r}
 #Trying a gamlss model on PAM data (T1, T2, T8, and T9), using Gumbel distribution:
 pam_long_timeseries <- pam_clean %>% 
@@ -255,7 +266,9 @@ summary(pam_mod2)
 ```
 
 # Base measurements
+
 ## Plots
+
 ```{r}
 ggplot(base_clean, aes(fill = Treatment, x=Date, y = Average_Diameter)) + 
         theme_classic() +
@@ -291,13 +304,14 @@ base_clean %>%
 #One extreme outlier
 ```
 
-
 ```{r}
 base_aov <- anova_test(data = base_clean, dv = Average_Diameter, wid = Anemone_ID, within = c(Date,Treatment))
 ```
 
 # Feeding time
+
 ## Plots
+
 ```{r}
 #Line graph of feeding time
 ggplot(data = food_summary, aes(x=Date, y = mean_time, group = Treatment, colour = Treatment)) + 
@@ -320,7 +334,9 @@ ggplot(food, aes(fill = Treatment, x=Date, y = Feeding_Time_Min)) +
         legend.title=element_text(size=20))
 ggsave("food_boxplot.png", width = 10, height = 7)
 ```
-#Testing distributions
+
+\#Testing distributions
+
 ```{r}
 shapiro.test(food$Feeding_Time_Min)
 #Data is non-normal
@@ -340,11 +356,15 @@ food %>%
 ```
 
 ## ANOVA
+
 ```{r}
 food_aov <- anova_test(data = food, dv = log_Feeding_Time_Min, wid = Anemone_ID, within = c(Treatment, Date))
 ```
+
 # Open/closed measurements
+
 ## Plots
+
 ```{r}
 ggplot(data = open_closed_summary, aes(x = Time_Block, y = n, fill = Open_Closed)) + 
   geom_bar(position = "fill", stat = "identity") + 
@@ -353,3 +373,35 @@ ggplot(data = open_closed_summary, aes(x = Time_Block, y = n, fill = Open_Closed
   theme_classic()
 ```
 
+## Exploratory data analysis
+
+```{r}
+#Summarizing the data
+summary(open_closed_summary)
+#Making frequency table
+table(open_closed_summary$Treatment, open_closed_summary$Open_Closed)
+
+```
+
+## Ordinal Logistic Regression Model First Attempt
+
+```{r}
+open_closed_model= polr(Open_Closed ~ Treatment + Time_Block + random(Date) , data = open_closed_summary, Hess = TRUE)
+summary(open_closed_model)
+
+#Compute confusion table
+predictOpen_Closed = predict(open_closed_model,open_closed_summary)
+table(open_closed_summary$Open_Closed, predictOpen_Closed)
+
+#Compute miscalculation error
+mean(as.character(open_closed_summary$Open_Closed) != as.character(predictOpen_Closed))
+
+```
+
+## Giant Green Ordinal Model
+
+```{r}
+gg_model = clmm(Open_Closed ~ Treatment + Time_Block + Treatment:Time_Block + (1|Anemone_ID), data = open_closed_summary)
+summary(gg_model)
+
+```
