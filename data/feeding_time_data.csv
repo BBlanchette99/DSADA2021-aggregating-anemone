@@ -1,4 +1,4 @@
-﻿Date,Type_of_Food,Site,Anemone_ID,Treatment,Bin,Feeding_Time_Min,Feeding_Time,Feeding_Start (m:s:ms),Feeding_Stop (m:s:ms)
+﻿Date,Type_of_Food,Site,Anemone_ID,Treatment,Bin,Feeding_Time_Min,Feeding_Time,Feeding_Start,Feeding_Stop
 10/28/2021,Fish,Foreshore,A1F,30C,J,1.72,1:43:00,16:22:00,18:05:00
 10/28/2021,Fish,Foreshore,A6F,25C,B,5.85,5:51:00,0:13:00,6:04:00
 10/28/2021,Fish,Foreshore,A10F,Control,N,4.1,4:06:00,12:57:00,17:03:00

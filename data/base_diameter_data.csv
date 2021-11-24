@@ -47,7 +47,7 @@ Date,Event,Treatment,Bin,Site,Species,Anemone_ID,Width,Length,Diagonal,Average_D
 31-Oct,Acclimation,NA,NA,Scotts,Aggregating ,A36S,19.4,24,20.6,21.33
 05-Nov,Pre-heat,25C,A,Foreshore,Aggregating ,A25F,14.7,22.6,21.5,19.6
 05-Nov,Pre-heat,25C,A,Bluestone,Aggregating ,A47B,13.7,19.4,16.3,16.47
-05-Nov,Pre-heat,25C,A,Bluestone,Aggregating ,A55B,NA,NA,NA,NA
+05-Nov,Pre-heat,25C,A,Bluestone,Aggregating ,A55B,0,0,0,0
 05-Nov,Pre-heat,25C,B,Foreshore,Aggregating ,A6F,19,23.4,20.5,20.97
 05-Nov,Pre-heat,25C,B,Foreshore,Aggregating ,A15F,21.7,24.3,20.6,22.2
 05-Nov,Pre-heat,25C,B,Scotts,Aggregating ,A42S,NA,NA,NA,NA
