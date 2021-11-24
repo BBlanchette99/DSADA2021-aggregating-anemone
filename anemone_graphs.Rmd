@@ -7,9 +7,9 @@ output: html_document
 
 ```{r}
 #load libraries:
-library(datarium)
-library(rstatix)
-library(ggpubr)
+#library(datarium)
+library(rstatix) #Used for anova_test function
+#library(ggpubr)
 library(DHARMa)
 library(mgcv)
 library(fitdistrplus)
@@ -21,6 +21,7 @@ library(LambertW)
 library(FSA)
 library(ez)
 library(MASS)
+library(ordinal)
 library(tidyverse)
 
 #Loading data
@@ -153,7 +154,7 @@ scale_colour_manual(values = c('#89226AFF',
         axis.title=element_text(size=20), 
         legend.text=element_text(size=15), 
         legend.title=element_text(size=20))
-ggsave("plots/pam_heatwave_only.png", width = 10, height = 7)
+ggsave(path = "plots",filename = "pam_heatwave_only.png", width = 10, height = 7)
 
 #Boxplot of pam morning vs. afternoon data
 pam_heatwave<-pam_clean%>%
@@ -174,7 +175,7 @@ ggplot(pam_heatwave, aes(fill=Treatment, y=Fv_Fm_av, x=Time)) +
         legend.title=element_text(size=20)) +
   labs(x = "Time of day", y = "Photosynthetic efficiency (Fv/Fm)")+
   facet_grid(. ~ Day)
-ggsave("plots/pam_MorningAfternoon.png")
+ggsave(path = "plots",filename = "pam_MorningAfternoon.png")
 ```
 
 ## Testing distributions
@@ -275,7 +276,7 @@ labs(x = "Date", Y = "Base diameter (mm)") +
         axis.title=element_text(size=20), 
         legend.text=element_text(size=15), 
         legend.title=element_text(size=20))
-ggsave("base_boxplot.png", width = 10, height = 7)
+ggsave(path = "plots",filename = "base_boxplot.png", width = 10, height = 7)
 ```
 
 ## Testing distributions
@@ -338,7 +339,7 @@ ggplot(food_clean, aes(fill = Treatment, x=Date, y = Feeding_Time_Min)) +
         axis.title=element_text(size=20), 
         legend.text=element_text(size=15), 
         legend.title=element_text(size=20))
-ggsave("food_boxplot.png", width = 10, height = 7)
+ggsave(path = "plots",filename = "food_boxplot.png", width = 10, height = 7)
 ```
 #Testing distributions
 ```{r}
@@ -380,13 +381,6 @@ ggplot(data = open_closed_summary, aes(x = Time_Block, y = n, fill = Open_Closed
 
 ## Ordinal regression
 ```{r}
-open_closed_mod <- polr(Open_Closed~Time_Block+Treatment, data = open_closed_clean, Hess = TRUE)
-summary(open_closed_mod)
-
-summary_table <- coef(summary(open_closed_mod))
-
-pval <- pnorm(abs(summary_table[, "t value"]),lower.tail = FALSE)* 2
-summary_table <- cbind(summary_table, "p value" = round(pval,3))
-summary_table
 ```
+
 
