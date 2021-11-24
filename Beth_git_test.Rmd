@@ -1,0 +1,16 @@
+---
+title: "Beth_github_test"
+author: "Beth Blanchette"
+date: "23/11/2021"
+output: pdf_document
+---
+
+
+## Trying to figure out Git
+I am becoming a coding master.
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
