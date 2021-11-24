@@ -9,6 +9,8 @@ output: pdf_document
 ## Trying to figure out Git
 I am becoming a coding master.
 
+## Adding a second heading
+Just because.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
