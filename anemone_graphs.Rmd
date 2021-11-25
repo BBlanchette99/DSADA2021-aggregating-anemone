@@ -9,20 +9,19 @@ output: html_document
 #load libraries:
 #library(datarium)
 library(rstatix) #Used for anova_test function
-#library(ggpubr)
+library(ggpubr) # Used to make QQ plot
 library(DHARMa)
 library(mgcv)
 library(fitdistrplus)
 library(goft)
-library(gamlss)
-library(ordinal)
-library(car)
+library(gamlss) # For gamlss models
+library(ordinal)#For ordinal regression
+#library(car)
 library(performance)
-library(LambertW)
+#library(LambertW)
 library(FSA)
-library(ez)
+#library(ez) #Used for ez ANOVA - delete if not using
 library(MASS)
-library(ordinal)
 library(tidyverse)
 
 #Loading data
@@ -62,7 +61,9 @@ base_summary <- base_clean%>%
 food_clean <- food%>%
   filter(Date != "10/28/2021", Anemone_ID != "G4F")%>%
   select(Date, Treatment, Bin, Site, Anemone_ID, Feeding_Time_Min)%>%
-  mutate(Feeding_Time_Min = as.numeric(Feeding_Time_Min))
+  mutate(Feeding_Time_Min = as.numeric(Feeding_Time_Min),Date = as.factor(Date), Site = as.factor(Site), Treatment = as.factor(Treatment), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin))%>%
+  select(Date, Treatment, Anemone_ID, Feeding_Time_Min)
+
 
 food_summary <- food%>%
   group_by(Date, Treatment)%>%
@@ -75,10 +76,7 @@ open_closed_clean <- open_closed %>%
 open_closed_summary <- open_closed %>%
  group_by(Date, Treatment, Time_Block, Anemone_ID)%>%
   count(Open_Closed) %>%
-  mutate(Date = as.factor(Date), Treatment = as.factor(Treatment),  Open_Closed = as.factor(Open_Closed), Open_Closed = fct_relevel(Open_Closed, "Open", "Partially open", "Closed"), Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))
-
-open_closed_summary$Open_Closed = factor(open_closed_summary$Open_Closed, levels = c("Open", "Partially open", "Closed"), ordered = TRUE)
-open_closed_summary$Date = factor(open_closed_summary$Date, levels = c("11/6/2021", "11/7/2021", "11/8/2021"), ordered = TRUE)
+  mutate(Date = as.factor(Date), Treatment = as.factor(Treatment),  Open_Closed = as.factor(Open_Closed), Open_Closed = factor(Open_Closed, levels = c("Open", "Partially open", "Closed"), ordered = TRUE), Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))
 ```
 
 # PAM data
@@ -118,7 +116,7 @@ ggplot(data = pam_summary,
         legend.text=element_text(size=15), 
         legend.title=element_text(size=20))
 
-ggsave(path = "plots",filename = "pam_timeseries.png", width = 10, height = 7)
+ggsave(path = "plots",filename = "pam_recovery_line.png", width = 10, height = 7)
 
 #Graph of PAM data during heatwave, with heatwave time periods marked
 ggplot(data = filter(pam_summary, 
@@ -163,7 +161,7 @@ scale_colour_manual(values = c('#89226AFF',
         axis.title=element_text(size=20), 
         legend.text=element_text(size=15), 
         legend.title=element_text(size=20))
-ggsave(path = "plots",filename = "pam_heatwave_only.png", width = 10, height = 7)
+ggsave(path = "plots",filename = "pam_heatwave_line.png", width = 10, height = 7)
 
 #Boxplot of pam morning vs. afternoon data
 pam_heatwave<-pam_clean%>%
@@ -184,7 +182,7 @@ ggplot(pam_heatwave, aes(fill=Treatment, y=Fv_Fm_av, x=Time)) +
         legend.title=element_text(size=20)) +
   labs(x = "Time of day", y = "Photosynthetic efficiency (Fv/Fm)")+
   facet_grid(. ~ Day)
-ggsave(path = "plots",filename = "pam_MorningAfternoon.png")
+ggsave(path = "plots",filename = "pam_heatwave_boxplot.png")
 ```
 
 ## Testing distributions
@@ -310,14 +308,10 @@ base_clean %>%
   group_by(Date, Treatment) %>%
   identify_outliers(log_diameter)
 #One extreme outlier
-
-#base_clean <- base_clean %>%
-#  mutate(Bin = as.factor(Bin), Site = as.factor(Site))%>%
- # group_by(Date,Treatment, Bin)%>%
- # summarize(mean_base = mean(Average_Diameter))
-  
 ```
 
+
+## ANOVA tests - delete later if not using
 ```{r}
 base_aov <- anova_test(data = base_clean, dv = log_diameter, wid = Anemone_ID, within = c(Treatment, Date))
 
@@ -328,6 +322,20 @@ test_aov2<-ezANOVA(data = base_clean, dv = .(log_diameter), wid = .(Anemone_ID),
 summary(test_aov)
 table(base_clean$Treatment, base_clean$Date)
 ```
+
+## Gamlss model
+```{r}
+
+fitDist(Average_Diameter, data = base_clean, type = "realAll", try.gamlss = T)
+#Best fit: Box-Cox (LNO)
+
+histDist(base_clean$Average_Diameter, "LNO", density = F, main = "Box-Cox")
+
+base_mod <- gamlss(Average_Diameter ~ Treatment + Date + Treatment*Date, data = base_clean, family = LNO(), control = gamlss.control(n.cyc = 200))
+
+summary(base_mod)
+```
+
 
 # Feeding time
 
@@ -356,15 +364,14 @@ ggplot(food_clean, aes(fill = Treatment, x=Date, y = Feeding_Time_Min)) +
 ggsave(path = "plots",filename = "food_boxplot.png", width = 10, height = 7)
 ```
 
-\#Testing distributions
+# Testing assumptiona
 
 ```{r}
 shapiro.test(food_clean$Feeding_Time_Min)
 #Data is non-normal
 
-food_clean <- food_clean %>%
-  mutate(log_Feeding_Time_Min = log(Feeding_Time_Min), Date = as.factor(Date), Site = as.factor(Site), Treatment = as.factor(Treatment), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin))%>%
-  select(Date, Treatment, Anemone_ID, log_Feeding_Time_Min)
+food_clean<-food_clean%>%
+  mutate(log_Feeding_Time_Min <- log(Feeding_Time_Min))
 shapiro_test(food_clean$log_Feeding_Time_Min)
 #Log transformed data fits normal distribution
 
@@ -377,7 +384,7 @@ food_clean %>%
 #Log transformed data has no extreme outliers
 ```
 
-## ANOVA
+## ANOVA - delete if not using
 
 ```{r}
 food_aov <- anova_test(data = food_clean, dv = log_Feeding_Time_Min, wid = Anemone_ID, within = c(Treatment, Date))
@@ -385,6 +392,20 @@ food_aov <- anova_test(data = food_clean, dv = log_Feeding_Time_Min, wid = Anemo
 
 test <- gamlss(log_Feeding_Time_Min ~ Treatment*Date + random(Anemone_ID),  data = food_clean)
 summary(test)
+```
+
+
+```{r}
+fitDist(Feeding_Time_Min, data = food_clean, type = "realAll", try.gamlss = T)
+#Best fit: Box-Cox (LNO)
+
+histDist(food_clean$Feeding_Time_Min, "LNO", density = F, main = "Box-Cox")
+
+base_mod <- gamlss(Feeding_Time_Min ~ Treatment*Date + random(Anemone_ID), data = food_clean, family = LNO)
+
+test <- gamlss(log_Feeding_Time_Min ~ Treatment*Date + random(Anemone_ID),  data = food_clean)
+
+summary(base_mod)
 ```
 
 # Open/closed measurements
