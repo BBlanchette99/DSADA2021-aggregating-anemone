@@ -21,7 +21,7 @@ pam<-read_delim("data/pam_data.csv", delim = ",")
 base <- read_delim("data/base_diameter_data.csv", delim = ",")
 food <- read_delim("data/feeding_time_data.csv", delim = ",")
 open_closed <- read_delim("data/open_closed_data.csv", delim = ",")
-hemocytometer <- read_delim("data/hemocytometer_data.csv", delim = ",")
+hemocytometer <- read_delim("data/hemocytometer_data_clean.csv", delim = ",")
 ```
 
 # Cleaning data
@@ -68,6 +68,14 @@ open_closed_summary <- open_closed %>%
  group_by(Date, Treatment, Time_Block, Anemone_ID)%>%
   count(Open_Closed) %>%
   mutate(Date = as.factor(Date), Treatment = as.factor(Treatment),  Open_Closed = as.factor(Open_Closed), Open_Closed = factor(Open_Closed, levels = c("Open", "Partially open", "Closed"), ordered = TRUE), Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))
+
+#Hemocytometer data
+hemo_clean <- hemocytometer %>%
+  mutate(Tentacle_Mass_mg = (Tentacle_Mass_g*1000), Dino_Density = ((Number_Dino_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Green_Density = ((Number_Green_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Dividing_Dino_Density = ((Dividing_Dino_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Dividing_Green_Density = ((Dividing_Green_Average*0.5)/(Tentacle_Mass_mg*0.0001))) %>%
+  mutate(Date = as.factor(Date), Treatment = as.factor(Treatment), Bin = as.factor(Bin), Anemone_ID = as.factor(Anemone_ID)) %>%
+  select(Date, Treatment, Bin, Anemone_ID, Tentacle_Mass_mg, Number_Dino_Average, Number_Green_Average, Dividing_Dino_Average, Dividing_Green_Average, Dino_Density, Green_Density, Dividing_Dino_Density, Dividing_Green_Density) %>%
+  group_by(Date, Treatment)
+  
 ```
 
 # PAM data
