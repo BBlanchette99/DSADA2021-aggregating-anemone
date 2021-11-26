@@ -256,7 +256,7 @@ summary(step_pam_mod)
 ```{r}
 #Trying a gamlss model on PAM data (T2, T3, T5, T6, T7), using GB1 distribution:
 pam_short_timeseries <- pam_clean %>% 
-  filter(Measurement == "T2" | Measurement  == "T3" | Measurement == "T5" | Measurement == "T6" | Measurement == "T7")%>%
+  filter(Measurement == "T2" | Measurement  == "T3" | Measurement == "T6" | Measurement == "T7")%>%
   mutate(Treatment = as.factor(Treatment), 
          Treatment = fct_relevel(Treatment, "Control", "25C", "30C"), Measurement = fct_relevel(Measurement, "T2", "T3", "T5", "T6", "T7"))
 
@@ -266,7 +266,7 @@ fitDist(Fv_Fm_av, data = pam_short_timeseries, type = "realAll", try.gamlss = T)
 histDist(pam_short_timeseries$Fv_Fm_av, "GG", density = F, main = "generalised Gamma Lopatatsidis-Green")
 
 #Interaction not working - ask Sara
-pam_mod_full2 <- gamlss(Fv_Fm_av ~ Treatment + Measurement + Treatment*Measurement + random(Anemone_ID), data = pam_short_timeseries, family = GG(), control = gamlss.control(n.cyc = 200))
+pam_mod_full2 <- gamlss(Fv_Fm_av ~ Treatment + Measurement + Treatment*Measurement + random(Anemone_ID), data = pam_short_timeseries, family = GB1(), method = mixed(50,100), control = gamlss.control(n.cyc = 200))
 
 summary(pam_mod_full2)
 ```
@@ -310,8 +310,8 @@ base_clean %>%
 #One extreme outlier
 ```
 
-
 ## ANOVA tests - delete later if not using
+
 ```{r}
 base_aov <- anova_test(data = base_clean, dv = log_diameter, wid = Anemone_ID, within = c(Treatment, Date))
 
@@ -324,6 +324,7 @@ table(base_clean$Treatment, base_clean$Date)
 ```
 
 ## Gamlss model
+
 ```{r}
 
 fitDist(Average_Diameter, data = base_clean, type = "realAll", try.gamlss = T)
@@ -335,7 +336,6 @@ base_mod <- gamlss(Average_Diameter ~ Treatment + Date + Treatment*Date, data = 
 
 summary(base_mod)
 ```
-
 
 # Feeding time
 
@@ -393,7 +393,6 @@ food_aov <- anova_test(data = food_clean, dv = log_Feeding_Time_Min, wid = Anemo
 test <- gamlss(log_Feeding_Time_Min ~ Treatment*Date + random(Anemone_ID),  data = food_clean)
 summary(test)
 ```
-
 
 ```{r}
 fitDist(Feeding_Time_Min, data = food_clean, type = "realAll", try.gamlss = T)
