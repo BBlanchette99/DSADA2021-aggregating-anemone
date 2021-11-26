@@ -11,9 +11,9 @@ library(rstatix) #Used for anova_test function
 library(DHARMa)
 library(fitdistrplus)#Used to fit distributions to data
 library(goft)
-library(gamlss) # For gamlss models
 library(ordinal)#For ordinal regression
 library(performance)
+library(gamlss) # For gamlss models
 library(tidyverse)
 
 #Loading data
@@ -49,7 +49,7 @@ pam_summary <- pam_clean%>%
 #Base data
 base_clean<-base%>%
   filter(Treatment != "NA", Average_Diameter != "NA")%>% 
-  mutate(Date = factor(Date, levels =c("Oct 31", "Nov 5", "Nov 9", "Nov 13")), Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin), Site = as.factor(Site)) %>% 
+  mutate(Date = factor(Date, levels =c("31-Oct", "05-Nov", "09-Nov", "13-Nov")), Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin), Site = as.factor(Site)) %>% 
 select(Date,Treatment,Bin,Site,Anemone_ID,Average_Diameter)
 
 base_summary <- base_clean%>%
@@ -328,9 +328,9 @@ fitDist(Average_Diameter, data = base_clean, type = "realAll", try.gamlss = T)
 
 histDist(base_clean$Average_Diameter, "LNO", density = F, main = "Box-Cox")
 
-base_mod_1 <- gamlss(Average_Diameter ~ Treatment + Date + Treatment*Date, data = base_clean, family = LNO())
+base_mod_1 <- gamlss(Average_Diameter ~ Treatment*Date, data = base_clean, family = LNO())
 
-base_mod_2 <- gamlss(log_diameter ~ Treatment + Date + Treatment*Date, data = base_clean, family = NO())
+base_mod_2 <- gamlss(log_diameter ~ Treatment*Date + random(Anemone_ID), data = base_clean, family = NO())
 
 AIC(base_mod_1, base_mod_2)
 #base_mod_2 (using the log-transformed data) has a lower AIC and therefore is a better fit for the data. 
