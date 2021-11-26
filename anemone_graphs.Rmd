@@ -249,9 +249,8 @@ histDist(pam_short_timeseries$Fv_Fm_av, "GB1", density = F, main = "generalised 
 
 # take out extra time point and retry
 # if that doesn't work, could explore using GB1 distribution instead (fitDist with type = "real0to1"), mixed 50:100
-pam_mod_full2 <- gamlss(Fv_Fm_av ~ Treatment + Measurement + Treatment*Measurement + random(Anemone_ID), data = pam_short_timeseries, family = GB1(), control = gamlss.control(n.cyc = 200))
+pam_mod_full2 <- gamlss(Fv_Fm_av ~ Treatment + Measurement + Treatment*Measurement + random(Anemone_ID), data = pam_short_timeseries, method = mixed(50:100), family = GB1(), control = gamlss.control(n.cyc = 200))
 
-GAIC(gg, gb1)
 histDist(pam_short_timeseries$Fv_Fm_av, "GG", density = F, main = "generalised Gamma Lopatatsidis-Green")
 histDist(pam_short_timeseries$Fv_Fm_av, "GB1", density = F, main = "GB1")
 
