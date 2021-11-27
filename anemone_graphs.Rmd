@@ -12,9 +12,9 @@ library(DHARMa)
 library(fitdistrplus)#Used to fit distributions to data
 library(goft)
 library(patchwork)#for making pretty figures
-library(gamlss) # For gamlss models
 library(ordinal)#For ordinal regression
 library(performance)
+library(gamlss) # For gamlss models
 library(tidyverse)
 
 #Loading data
@@ -30,12 +30,18 @@ hemocytometer <- read_delim("data/hemocytometer_data_clean.csv", delim = ",")
 ```{r}
 #Function to calculate standard error for summarizing data
 standard_error <- function(x) sd(x) / sqrt(length(x))
-
 #PAM data
 pam_clean <- pam %>%
   filter(Measurement != "NA")%>% #Removing dates with PAM measurements that we are not using due to technical errors
   select(Date,Time,Measurement,Treatment,Bin,Site,Anemone_ID,Fv_Fm_av)%>%
-  mutate(Date = as.POSIXct(as.character(Date),   format="%m/%d/%Y %H:%M:%S"),Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin), Measurement = as.factor(Measurement), Site = as.factor(Site), Time = factor(Time, levels = c("Morning", "Afternoon")),Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"))
+  mutate(Date = as.POSIXct(as.character(Date),
+                           format="%m/%d/%Y %H:%M:%S"),
+         Anemone_ID = as.factor(Anemone_ID), 
+         Bin = as.factor(Bin), 
+         Measurement = as.factor(Measurement), 
+         Site = as.factor(Site), 
+         Time = factor(Time, levels = c("Morning", "Afternoon")),
+         Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"))
 
 pam_summary <- pam_clean%>%
   group_by(Date, Measurement, Treatment) %>%
@@ -62,14 +68,13 @@ food_summary <- food%>%
   summarize(mean_time = mean(Feeding_Time_Min), se_time = standard_error(Feeding_Time_Min))
 
 open_closed_clean <- open_closed %>%
-  mutate(Date = as.factor(Date), Site = as.factor(Site),Anemone_ID = as.factor(Anemone_ID),Treatment = as.factor(Treatment), Bin=as.factor(Bin), Open_Closed = as.factor(Open_Closed), Open_Closed = fct_relevel(Open_Closed, "Closed", "Partially open", "Open"), Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))%>%
-select(Date, Time_Block, Anemone_ID,Treatment, Bin, Site, Open_Closed)
+  mutate(Date = as.factor(Date),Anemone_ID = as.factor(Anemone_ID),Time_Block = fct_relevel(as.factor(Time_Block), "0", "1", "2", "3", "4", "5", "6"), Treatment = as.factor(Treatment),  Open_Closed = as.factor(Open_Closed), Open_Closed = factor(Open_Closed, levels = c("Open", "Partially open", "Closed"), ordered = TRUE), Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))%>%
+  select(Date, Time_Block, Treatment, Open_Closed, Anemone_ID)
 
-open_closed_summary <- open_closed %>%
- group_by(Date, Treatment, Time_Block, Anemone_ID)%>%
-  count(Open_Closed) %>%
-  mutate(Date = as.factor(Date), Treatment = as.factor(Treatment),  Open_Closed = as.factor(Open_Closed), Open_Closed = factor(Open_Closed, levels = c("Open", "Partially open", "Closed"), ordered = TRUE), Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))
-
+open_closed_summary <- open_closed_clean %>%
+group_by(Date, Treatment, Time_Block)%>%
+  count(Open_Closed)
+  
 #Hemocytometer data
 hemo_clean <- hemocytometer %>%
   mutate(Tentacle_Mass_mg = (Tentacle_Mass_g*1000), Dino_Density = ((Number_Dino_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Green_Density = ((Number_Green_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Dino_MI = (Dividing_Dino_Average/Number_Dino_Average), Green_MI = (Dividing_Green_Average/Number_Green_Average)) %>%
@@ -255,22 +260,26 @@ summary(pam_mod)
 ```{r}
 #Trying a gamlss model on PAM data (T2, T3, T6, T7), using GB1 distribution:
 pam_short_timeseries <- pam_clean %>% 
-  filter(Measurement == "T2" | Measurement  == "T3" | Measurement == "T6" | Measurement == "T7")#%>%
+  filter(Measurement == "T2" | Measurement  == "T3" |  Measurement == "T6" | Measurement == "T7")%>%
+  mutate(Measurement = fct_relevel(Measurement, "T2", "T3", "T6", "T7"), Date = as.factor(Date))%>%
+select(Date, Measurement, Treatment, Anemone_ID, Fv_Fm_av)
 
-fitDist(Fv_Fm_av, data = pam_short_timeseries, type = "real0to1", try.gamlss = T)
+
+fitDist(Fv_Fm_av, data = pam_short_timeseries, type = "realAll", try.gamlss = T)
 #Best fit: generalized beta type 1
 
 histDist(pam_short_timeseries$Fv_Fm_av, "GB1", density = F, main = "generalised beta type 1")
 
 # take out extra time point and retry
 # if that doesn't work, could explore using GB1 distribution instead (fitDist with type = "real0to1"), mixed 50:100
-pam_mod_full2 <- gamlss(Fv_Fm_av ~ Treatment + Measurement + Treatment*Measurement + random(Anemone_ID), data = pam_short_timeseries, method = mixed(50:100), family = GB1(), control = gamlss.control(n.cyc = 200))
+pam_mod_full2 <- gamlss(Fv_Fm_av ~ Treatment*Measurement + random(Anemone_ID), data = pam_short_timeseries, family = GB1(), method = mixed(50:100), control = gamlss.control(n.cyc=200))
 
 histDist(pam_short_timeseries$Fv_Fm_av, "GG", density = F, main = "generalised Gamma Lopatatsidis-Green")
 histDist(pam_short_timeseries$Fv_Fm_av, "GB1", density = F, main = "GB1")
 
 summary(pam_mod_full2)
 ```
+
 
 # Base measurements
 
@@ -333,9 +342,9 @@ fitDist(Average_Diameter, data = base_clean, type = "realAll", try.gamlss = T)
 
 histDist(base_clean$Average_Diameter, "LNO", density = F, main = "Box-Cox")
 
-base_mod_1 <- gamlss(Average_Diameter ~ Treatment + Date + Treatment*Date, data = base_clean, family = LNO())
+base_mod_1 <- gamlss(Average_Diameter ~ Treatment*Date, data = base_clean, family = LNO())
 
-base_mod_2 <- gamlss(log_diameter ~ Treatment + Date + Treatment*Date, data = base_clean, family = NO())
+base_mod_2 <- gamlss(log_diameter ~ Treatment*Date + random(Anemone_ID), data = base_clean, family = NO())
 
 AIC(base_mod_1, base_mod_2)
 #base_mod_2 (using the log-transformed data) has a lower AIC and therefore is a better fit for the data. 
@@ -429,7 +438,10 @@ ggplot(data = open_closed_summary, aes(x = Time_Block, y = n, fill = Open_Closed
   geom_bar(position = "fill", stat = "identity") + 
   facet_grid(Date ~ Treatment) +
   labs(x="Time (hours)", y = "Proportion") +
-  theme_classic()
+  theme_classic()+
+scale_fill_manual(values = c('#89226AFF',
+                              '#2C728EFF',    
+                              '#E65154FF')) 
 ggsave(path = "plots",filename = "open_closed_plot.png", width = 10, height = 7)
 ```
 
@@ -443,30 +455,16 @@ table(open_closed_summary$Treatment, open_closed_summary$Open_Closed)
 
 ```
 
-## Ordinal Logistic Regression Model First Attempt
-
-```{r}
-open_closed_model= polr(Open_Closed ~ Treatment + Time_Block + Date + Treatment*Date , data = open_closed_summary, Hess = TRUE)
-summary(open_closed_model)
-
-#Compute confusion table
-predictOpen_Closed = predict(open_closed_model,open_closed_summary)
-table(open_closed_summary$Open_Closed, predictOpen_Closed)
-
-#Compute miscalculation error
-mean(as.character(open_closed_summary$Open_Closed) != as.character(predictOpen_Closed))
-
-```
 
 ## Giant Green Ordinal Model
 
 ```{r}
-gg_model = clmm(Open_Closed ~ Treatment + Time_Block + Treatment:Time_Block + (1|Anemone_ID), data = open_closed_summary)
+gg_model = clmm(Open_Closed ~ Treatment:Time_Block + (1|Anemone_ID), data = open_closed_clean)
 summary(gg_model)
 
 
-gg_model = clmm(Open_Closed ~ Treatment:Time_Block:Date + (1|Anemone_ID), data = open_closed_summary)
-summary(gg_model)
+ord_model = clmm(Open_Closed ~ Treatment:Time_Block:Date + (1|Anemone_ID), data = open_closed_clean)
+summary(ord_model)
 
 ```
 
