@@ -15,6 +15,7 @@ library(patchwork)#for making pretty figures
 library(ordinal)#For ordinal regression
 library(performance)
 library(gamlss) # For gamlss models
+library(brms) #for baysian model
 library(tidyverse)
 
 #Loading data
@@ -69,7 +70,7 @@ food_summary <- food%>%
 
 open_closed_clean <- open_closed %>%
   mutate(Date = as.factor(Date),Anemone_ID = as.factor(Anemone_ID),Time_Block = fct_relevel(as.factor(Time_Block), "0", "1", "2", "3", "4", "5", "6"), Treatment = as.factor(Treatment),  Open_Closed = as.factor(Open_Closed), Open_Closed = factor(Open_Closed, levels = c("Open", "Partially open", "Closed"), ordered = TRUE), Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))%>%
-  select(Date, Time_Block, Treatment, Open_Closed, Anemone_ID)
+  select(Date, Time_Block,Bin, Treatment, Open_Closed, Anemone_ID)
 
 open_closed_summary <- open_closed_clean %>%
 group_by(Date, Treatment, Time_Block)%>%
@@ -255,6 +256,7 @@ formula(pam_mod)
 #Final model includes treatment, measurement, treatment * measurement, and random(Anemone_ID)
 
 summary(pam_mod)
+summary(pam_test_mod)
 ```
 
 ```{r}
@@ -262,7 +264,7 @@ summary(pam_mod)
 pam_short_timeseries <- pam_clean %>% 
   filter(Measurement == "T2" | Measurement  == "T3" |  Measurement == "T6" | Measurement == "T7")%>%
   mutate(Measurement = fct_relevel(Measurement, "T2", "T3", "T6", "T7"), Date = as.factor(Date))%>%
-select(Date, Measurement, Treatment, Anemone_ID, Fv_Fm_av)
+select(Date, Measurement, Treatment, Anemone_ID, Fv_Fm_av, Bin, Site)
 
 
 fitDist(Fv_Fm_av, data = pam_short_timeseries, type = "realAll", try.gamlss = T)
@@ -270,9 +272,13 @@ fitDist(Fv_Fm_av, data = pam_short_timeseries, type = "realAll", try.gamlss = T)
 
 histDist(pam_short_timeseries$Fv_Fm_av, "GB1", density = F, main = "generalised beta type 1")
 
-# take out extra time point and retry
-# if that doesn't work, could explore using GB1 distribution instead (fitDist with type = "real0to1"), mixed 50:100
-pam_mod_full2 <- gamlss(Fv_Fm_av ~ Treatment*Measurement + random(Anemone_ID), data = pam_short_timeseries, family = GB1(), method = mixed(50:100), control = gamlss.control(n.cyc=200))
+pam_mod_full2 <- gamlss(Fv_Fm_av ~ Treatment + Measurement + Treatment*Measurement + random(as.factor(Bin)) + random(as.factor(Site)), data = pam_short_timeseries, family = GG(), method = RS(), control = gamlss.control(n.cyc=200))
+
+
+step <- stepGAIC(pam_mod_full2, direction = "backward")
+formula(step)
+step$anova
+summary(step)
 
 histDist(pam_short_timeseries$Fv_Fm_av, "GG", density = F, main = "generalised Gamma Lopatatsidis-Green")
 histDist(pam_short_timeseries$Fv_Fm_av, "GB1", density = F, main = "GB1")
@@ -466,6 +472,20 @@ summary(gg_model)
 ord_model = clmm(Open_Closed ~ Treatment:Time_Block:Date + (1|Anemone_ID), data = open_closed_clean)
 summary(ord_model)
 
+fitDist(Open_Closed, data = open_closed_clean, type = "realAll", try.gamlss = T)
+
+```
+
+```{r}
+#options(mc.cores=parallel::detectCores())
+bay_mod <- brm(Open_Closed ~ Treatment + Time_Block + Treatment*Time_Block, data = open_closed_clean)
+
+bay_mod = brm(Open_Closed~Treatment, data = open_closed_clean, family = gaussian(), iter = 2000, chains = 4, warmup = 1000, control = list(adapt_delta = 0.99))
+
+test_mod <-art(Open_Closed ~ Treatment*Time_Block + (1|Bin), data=open_closed_clean)
+summary(test_mod)
+test_aov <- anova(test_mod)
+TukeyHSD(test_aov)
 ```
 
 # Hemocytometer Data
