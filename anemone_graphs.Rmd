@@ -11,6 +11,7 @@ library(rstatix) #Used for anova_test function
 library(DHARMa)
 library(fitdistrplus)#Used to fit distributions to data
 library(goft)
+library(patchwork)#for making pretty figures
 library(gamlss) # For gamlss models
 library(ordinal)#For ordinal regression
 library(performance)
@@ -71,10 +72,15 @@ open_closed_summary <- open_closed %>%
 
 #Hemocytometer data
 hemo_clean <- hemocytometer %>%
-  mutate(Tentacle_Mass_mg = (Tentacle_Mass_g*1000), Dino_Density = ((Number_Dino_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Green_Density = ((Number_Green_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Dividing_Dino_Density = ((Dividing_Dino_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Dividing_Green_Density = ((Dividing_Green_Average*0.5)/(Tentacle_Mass_mg*0.0001))) %>%
+  mutate(Tentacle_Mass_mg = (Tentacle_Mass_g*1000), Dino_Density = ((Number_Dino_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Green_Density = ((Number_Green_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Dino_MI = (Dividing_Dino_Average/Number_Dino_Average), Green_MI = (Dividing_Green_Average/Number_Green_Average)) %>%
   mutate(Date = as.factor(Date), Treatment = as.factor(Treatment), Bin = as.factor(Bin), Anemone_ID = as.factor(Anemone_ID)) %>%
-  select(Date, Treatment, Bin, Anemone_ID, Tentacle_Mass_mg, Number_Dino_Average, Number_Green_Average, Dividing_Dino_Average, Dividing_Green_Average, Dino_Density, Green_Density, Dividing_Dino_Density, Dividing_Green_Density) %>%
+  mutate(Date = as.POSIXct(as.character(Date),   format="%m/%d/%Y")) %>%
+  select(Date, Treatment, Bin, Anemone_ID, Tentacle_Mass_mg, Number_Dino_Average, Number_Green_Average, Dividing_Dino_Average, Dividing_Green_Average, Dino_Density, Green_Density, Dino_MI, Green_MI) %>%
   group_by(Date, Treatment)
+
+hemo_summary <- hemo_clean%>%
+  group_by(Date, Treatment) %>%
+  summarize(mean_Dino_Density = mean(Dino_Density), se_Dino_Density = standard_error(Dino_Density), mean_Green_Density = mean(Green_Density), se_Green_Density = standard_error(Green_Density), mean_Dino_MI = mean(Dino_MI), se_Dino_MI = standard_error(Dino_MI), mean_Green_MI = mean(Green_MI), se_Green_MI = standard_error(Green_MI))
   
 ```
 
@@ -463,3 +469,50 @@ gg_model = clmm(Open_Closed ~ Treatment:Time_Block:Date + (1|Anemone_ID), data =
 summary(gg_model)
 
 ```
+
+# Hemocytometer Data
+
+## Plots
+```{r}
+#Dinoflagellate density
+p1 = ggplot(data = hemo_summary, 
+       aes(x= Date, 
+           y = mean_Dino_Density, 
+           group = Treatment, 
+           colour = Treatment)) +
+  theme_classic() +
+  geom_errorbar(aes(ymin = mean_Dino_Density - se_Dino_Density, 
+                    ymax = mean_Dino_Density + se_Dino_Density), 
+                   width=30000) +
+  geom_point(size=2.5) +
+  geom_line(lwd = 1.5) +
+  labs(x="Date", 
+       y = "Dinoflagellate density (cells/mg)")
+
+#Mitotic Index of Dinoflagellates
+p2 = ggplot(data = hemo_summary, 
+       aes(x= Date, 
+           y = mean_Dino_MI, 
+           group = Treatment, 
+           colour = Treatment)) +
+  theme_classic() +
+  geom_errorbar(aes(ymin = mean_Dino_MI - se_Dino_MI, 
+                    ymax = mean_Dino_MI + se_Dino_MI), 
+                   width=30000) +
+  geom_point(size=2.5) +
+  geom_line(lwd = 1.5) +
+  labs(x="Date", 
+       y = "Dinoflagellate Mitotic Index")
+
+p1 + p2
+
+ggsave(path = "plots",filename = "dinoflagellate_density_MI.png", width = 10, height = 4)
+
+  #scale_fill_manual(values = c('#89226AFF',
+                            #  '#2C728EFF',    
+                             # '#E65154FF')) +
+  #scale_colour_manual(values = c('#89226AFF',
+                              #   '#2C728EFF',
+                               #  '#E65154FF'))
+```
+
