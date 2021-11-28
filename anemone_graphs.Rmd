@@ -4,8 +4,9 @@ author: "Caitlin Bergman"
 date: "11/11/2021"
 output: html_document
 ---
-Loading libraries and data
+
 ```{r}
+#load libraries:
 library(rstatix) #Used for anova_test function
 library(DHARMa)
 library(fitdistrplus)#Used to fit distributions to data
@@ -29,12 +30,9 @@ hemocytometer <- read_delim("data/hemocytometer_data_clean.csv", delim = ",")
 # Cleaning data
 
 ```{r}
-#Creating a clean dataframe for each response variable, and a summarized dataframe with average value for each treatment at each measurement time
-
-#Function to calculate standard error for data summaries
+#Function to calculate standard error for summarizing data
 standard_error <- function(x) sd(x) / sqrt(length(x))
-
-#cleaning PAM data
+#PAM data
 pam_clean <- pam %>%
   filter(Measurement != "NA")%>% #Removing dates with PAM measurements that we are not using due to technical errors
   select(Date,Time,Measurement,Treatment,Bin,Site,Anemone_ID,Fv_Fm_av)%>%
@@ -44,14 +42,14 @@ pam_clean <- pam %>%
          Bin = as.factor(Bin), 
          Measurement = as.factor(Measurement), 
          Site = as.factor(Site), 
-         Time = factor(Time, levels = c("Pre-heat", "Post-heat")),
+         Time = factor(Time, levels = c("Morning", "Afternoon")),
          Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"))
 
 pam_summary <- pam_clean%>%
   group_by(Date, Measurement, Treatment) %>%
   summarize(mean_FvFm = mean(Fv_Fm_av), se_FvFm = standard_error(Fv_Fm_av))
 
-#Cleaning base data
+#Base data
 base_clean<-base%>%
   filter(Treatment != "NA", Average_Diameter != "NA")%>% 
   mutate(Date = factor(Date, levels =c("31-Oct", "05-Nov", "09-Nov", "13-Nov")), Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin), Site = as.factor(Site)) %>% 
@@ -61,7 +59,7 @@ base_summary <- base_clean%>%
   group_by(Date, Treatment)%>%
   summarize(mean_base = mean(Average_Diameter), se_base = standard_error(Average_Diameter))
 
-#Cleaning feeding time data
+#Feeding time data
 food_clean <- food%>%
   filter(Date != "10/28/2021")%>%
   mutate(Feeding_Time_Min = as.numeric(Feeding_Time_Min),Date = as.factor(Date), Site = as.factor(Site), Treatment = as.factor(Treatment), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin))%>%
@@ -71,7 +69,7 @@ food_summary <- food%>%
   group_by(Date, Treatment)%>%
   summarize(mean_time = mean(Feeding_Time_Min), se_time = standard_error(Feeding_Time_Min))
 
-#Cleaning open/closed response data
+
 open_closed_clean <- open_closed %>%
   mutate(Date = as.factor(Date),Anemone_ID = as.factor(Anemone_ID),Time_Block = fct_relevel(as.factor(Time_Block), "0", "1", "2", "3", "4", "5", "6"), Treatment = as.factor(Treatment),  Open_Closed = as.factor(Open_Closed), Open_Closed = factor(Open_Closed, levels = c("Open", "Partially open", "Closed"), ordered = TRUE), Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))%>%
   dplyr::select(Date, Time_Block,Bin, Treatment, Open_Closed, Anemone_ID)
@@ -80,7 +78,7 @@ open_closed_summary <- open_closed_clean %>%
 group_by(Date, Treatment, Time_Block)%>%
   count(Open_Closed)
   
-#Cleaning hemocytometer data
+#Hemocytometer data
 hemo_clean <- hemocytometer %>%
   mutate(Tentacle_Mass_mg = (Tentacle_Mass_g*1000), Dino_Density = ((Number_Dino_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Green_Density = ((Number_Green_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Dino_MI = (Dividing_Dino_Average/Number_Dino_Average), Green_MI = (Dividing_Green_Average/Number_Green_Average)) %>%
   mutate(Date = as.factor(Date), Treatment = as.factor(Treatment), Bin = as.factor(Bin), Anemone_ID = as.factor(Anemone_ID)) %>%
@@ -94,11 +92,13 @@ hemo_summary <- hemo_clean%>%
   
 ```
 
-# PAM data analysis
+# PAM data
 
 ## Plots
-Plotting a timeseries of all PAM data
+
 ```{r}
+#Line graph of all PAM data
+
 ggplot(data = pam_summary, 
        aes(x=Date, 
            y = mean_FvFm, 
@@ -130,12 +130,10 @@ ggplot(data = pam_summary,
         legend.title=element_text(size=20))
 
 ggsave(path = "plots",filename = "pam_overall_line.png", width = 10, height = 7)
-```
 
-Plotting a timeseries of all morning PAM measurements (5 timepoints)
-```{r}
+#Plot of overall trend (Acclimation, beginning/end of heatwave, end of recovery)
 p1_data <- pam_summary%>%
-  filter(Measurement == "T1"| Measurement == "T2"| Measurement == "T6" | Measurement == "T8"| Measurement =="T9")
+  filter(Measurement == "T1"| Measurement == "T2"|Measurement== "T6" |Measurement == "T8"| Measurement =="T9")
 
 ggplot(data = p1_data,
        aes(x=Date, 
@@ -164,11 +162,8 @@ ggplot(data = p1_data,
         legend.text=element_text(size=15), 
         legend.title=element_text(size=20))
 
-ggsave(path = "plots",filename = "pam_timeseries.jpg", width = 15, height = 7)
-```
+ggsave(path = "plots",filename = "pam_timeseries.png", width = 10, height = 7)
 
-# Check with Beth, then delete this graph:
-```{R}
 #Graph of PAM data during heatwave, with heatwave time periods marked
 ggplot(data = filter(pam_summary, 
                      Measurement != "T1" & Measurement != "T8" & Measurement != "T9"), 
@@ -208,43 +203,34 @@ scale_fill_manual(values = c('#89226AFF',
 scale_colour_manual(values = c('#89226AFF', 
                                '#2C728EFF', 
                               '#E65154FF'))+
-  theme(axis.text=element_text(size=30),
-        axis.title=element_text(size=35), 
-        legend.text=element_text(size=30), 
-        legend.title=element_text(size=35))
+  theme(axis.text=element_text(size=15),
+        axis.title=element_text(size=20), 
+        legend.text=element_text(size=15), 
+        legend.title=element_text(size=20))
 ggsave(path = "plots",filename = "pam_heatwave_line.png", width = 10, height = 7)
-```
 
-
-Plot comparing morning and afternoon PAM measurements on first and third days of heatwave:
-```{R}
+#Boxplot of pam morning vs. afternoon data
 pam_heatwave<-pam_clean%>%
   filter(Measurement == "T2" | 
         Measurement == "T3" | 
         Measurement == "T6" | 
         Measurement == "T7") %>%
-  separate(Date, c('Day', 'Hour'), sep = " ", remove = T)%>%
- mutate(Day = fct_relevel(Day, "2021-11-06", "2021-11-08"))
-
-  levels(pam_heatwave$Day) <- c("Heatwave day 1", "Heatwave day 3")
-
+  separate(Date, c('Day', 'Hour'), sep = " ", remove = T)
 
 ggplot(pam_heatwave, aes(fill=Treatment, y=Fv_Fm_av, x=Time)) + 
   geom_boxplot() +
  scale_fill_manual(values = c('#89226AFF','#2C728EFF','#E65154FF')) +
-   labs(x = "Measurement time", y = "Photosynthetic efficiency (Fv/Fm)")+
-  facet_grid(.~Day) +
-  theme_classic() +
-  theme(strip.text.x = element_text(size = 15),
-       axis.text=element_text(size=15),
+  theme(axis.text=element_text(size=15),
         axis.title=element_text(size=20), 
         legend.text=element_text(size=15), 
-        legend.title=element_text(size=20))
-        
-ggsave(path = "plots",filename = "pam_heatwave_boxplot.png", width = 15, height = 7)
+        legend.title=element_text(size=20)) +
+  labs(x = "Time of day", y = "Photosynthetic efficiency (Fv/Fm)")+
+  facet_grid(. ~ Day)
+ggsave(path = "plots",filename = "pam_heatwave_boxplot.png")
 ```
 
 ## Testing distributions
+
 ```{r}
 #Checking assumptions of PAM data
 #Outliers
@@ -287,17 +273,15 @@ histDist(pam_clean$Fv_Fm_av, "GB1", density = F, main = "GB1")
 #Gamlss model for whole-experiment PAM data (T1, T2, T8, and T9) using Gumbel distribution:
 
 pam_long_timeseries <- pam_clean %>% 
-  filter(Measurement == "T1" | Measurement  == "T2" |Measurement == "T6"| Measurement == "T8" | Measurement == "T9")%>%
-  mutate(Measurement = fct_relevel(Measurement, "T1", "T2", "T6", "T8", "T9"))
+  filter(Measurement == "T1" | Measurement  == "T2" | Measurement == "T8" | Measurement == "T9")
          
-
 fitDist(Fv_Fm_av, data = pam_long_timeseries, type = "realAll", try.gamlss = T)
 #Outcome: Gumbel is the best fit
 
 histDist(pam_long_timeseries$Fv_Fm_av, "GU", density = F, main = "Gumbel")
 
 #Full model
-pam_full_mod <- gamlss(Fv_Fm_av ~ Treatment + Measurement + Treatment*Measurement + random(Anemone_ID) + random(Site) + random(Bin), data = pam_long_timeseries, family = GU(), control = gamlss.control(n.cyc=200))
+pam_full_mod <- gamlss(Fv_Fm_av ~ Treatment + Measurement + Treatment*Measurement + random(Anemone_ID) + random(Site) + random(Bin), data = pam_long_timeseries, family = GU())
 
 #Backwards model selection to find best model:
 pam_mod <- stepGAIC(pam_full_mod, direction = "backward", trace = F)
@@ -306,6 +290,7 @@ formula(pam_mod)
 #Final model includes treatment, measurement, treatment * measurement, and random(Anemone_ID)
 
 summary(pam_mod)
+summary(pam_test_mod)
 ```
 
 ```{r}
