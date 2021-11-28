@@ -14,6 +14,7 @@ library(goft)
 library(patchwork)#for making pretty figures
 library(ordinal)#For ordinal regression
 library(performance)
+library(scales)
 library(gamlss) # For gamlss models
 library(brms) #for baysian model
 library(tidyverse)
@@ -68,9 +69,10 @@ food_summary <- food%>%
   group_by(Date, Treatment)%>%
   summarize(mean_time = mean(Feeding_Time_Min), se_time = standard_error(Feeding_Time_Min))
 
+
 open_closed_clean <- open_closed %>%
   mutate(Date = as.factor(Date),Anemone_ID = as.factor(Anemone_ID),Time_Block = fct_relevel(as.factor(Time_Block), "0", "1", "2", "3", "4", "5", "6"), Treatment = as.factor(Treatment),  Open_Closed = as.factor(Open_Closed), Open_Closed = factor(Open_Closed, levels = c("Open", "Partially open", "Closed"), ordered = TRUE), Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))%>%
-  select(Date, Time_Block,Bin, Treatment, Open_Closed, Anemone_ID)
+  dplyr::select(Date, Time_Block,Bin, Treatment, Open_Closed, Anemone_ID)
 
 open_closed_summary <- open_closed_clean %>%
 group_by(Date, Treatment, Time_Block)%>%
@@ -127,7 +129,40 @@ ggplot(data = pam_summary,
         legend.text=element_text(size=15), 
         legend.title=element_text(size=20))
 
-ggsave(path = "plots",filename = "pam_recovery_line.png", width = 10, height = 7)
+ggsave(path = "plots",filename = "pam_overall_line.png", width = 10, height = 7)
+
+#Plot of overall trend (Acclimation, beginning/end of heatwave, end of recovery)
+p1_data <- pam_summary%>%
+  filter(Measurement == "T1"| Measurement == "T2"|Measurement== "T6" |Measurement == "T8"| Measurement =="T9")
+
+ggplot(data = p1_data,
+       aes(x=Date, 
+           y = mean_FvFm, 
+           group = Treatment, 
+           colour = Treatment)) +
+  theme_classic() +
+  geom_vline(xintercept = as.POSIXct("2021-11-06 09:00:00"),
+             linetype = "dotted", 
+             size = 1) +
+  geom_vline(xintercept = as.POSIXct("2021-11-08 16:00:00"), 
+             linetype = "dotted", 
+             size = 1)+
+  geom_point(size=2.5) +
+  geom_line(lwd = 1.5) +
+ scale_x_datetime(breaks=date_breaks("3 days"),labels=date_format("%b-%d"))+
+  geom_errorbar(aes(ymin = mean_FvFm - se_FvFm, 
+                    ymax = mean_FvFm + se_FvFm), 
+                    width=30000)+
+  labs(x="Date", 
+       y = "Photosynthetic efficiency (Fv/Fm)") +
+  scale_fill_manual(values = c('#89226AFF', '#2C728EFF','#E65154FF'))+
+  scale_colour_manual(values = c('#89226AFF', '#2C728EFF','#E65154FF'))+
+  theme(axis.text=element_text(size=15),
+        axis.title=element_text(size=20), 
+        legend.text=element_text(size=15), 
+        legend.title=element_text(size=20))
+
+ggsave(path = "plots",filename = "pam_timeseries.png", width = 10, height = 7)
 
 #Graph of PAM data during heatwave, with heatwave time periods marked
 ggplot(data = filter(pam_summary, 
@@ -184,9 +219,7 @@ pam_heatwave<-pam_clean%>%
 
 ggplot(pam_heatwave, aes(fill=Treatment, y=Fv_Fm_av, x=Time)) + 
   geom_boxplot() +
-  scale_fill_manual(values = c('#89226AFF',
-                             '#2C728EFF',           
-                             '#E65154FF')) +
+ scale_fill_manual(values = c('#89226AFF','#2C728EFF','#E65154FF')) +
   theme(axis.text=element_text(size=15),
         axis.title=element_text(size=20), 
         legend.text=element_text(size=15), 
@@ -238,6 +271,7 @@ histDist(pam_clean$Fv_Fm_av, "GB1", density = F, main = "GB1")
 
 ```{r}
 #Gamlss model for whole-experiment PAM data (T1, T2, T8, and T9) using Gumbel distribution:
+
 pam_long_timeseries <- pam_clean %>% 
   filter(Measurement == "T1" | Measurement  == "T2" | Measurement == "T8" | Measurement == "T9")
          
@@ -265,7 +299,6 @@ pam_short_timeseries <- pam_clean %>%
   filter(Measurement == "T2" | Measurement  == "T3" |  Measurement == "T6" | Measurement == "T7")%>%
   mutate(Measurement = fct_relevel(Measurement, "T2", "T3", "T6", "T7"), Date = as.factor(Date))%>%
 select(Date, Measurement, Treatment, Anemone_ID, Fv_Fm_av, Bin, Site)
-
 
 fitDist(Fv_Fm_av, data = pam_short_timeseries, type = "realAll", try.gamlss = T)
 #Best fit: generalized beta type 1
@@ -462,7 +495,7 @@ table(open_closed_summary$Treatment, open_closed_summary$Open_Closed)
 ```
 
 
-## Giant Green Ordinal Model
+## Giant Green Ordinal Model - don't work, delete later
 
 ```{r}
 gg_model = clmm(Open_Closed ~ Treatment:Time_Block + (1|Anemone_ID), data = open_closed_clean)
@@ -477,15 +510,9 @@ fitDist(Open_Closed, data = open_closed_clean, type = "realAll", try.gamlss = T)
 ```
 
 ```{r}
-#options(mc.cores=parallel::detectCores())
-bay_mod <- brm(Open_Closed ~ Treatment + Time_Block + Treatment*Time_Block, data = open_closed_clean)
-
-bay_mod = brm(Open_Closed~Treatment, data = open_closed_clean, family = gaussian(), iter = 2000, chains = 4, warmup = 1000, control = list(adapt_delta = 0.99))
-
-test_mod <-art(Open_Closed ~ Treatment*Time_Block + (1|Bin), data=open_closed_clean)
-summary(test_mod)
-test_aov <- anova(test_mod)
-TukeyHSD(test_aov)
+options(mc.cores=parallel::detectCores())
+#Weakly flat priors
+bay_mod <- brm(Open_Closed ~ Treatment + Time_Block + Treatment*Time_Block + (1|Anemone_ID), data = open_closed_clean, family = cumulative("logit"))
 ```
 
 # Hemocytometer Data
