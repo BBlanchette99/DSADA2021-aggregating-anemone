@@ -16,6 +16,7 @@ library(ordinal)#For ordinal regression
 library(performance)
 library(gamlss) # For gamlss models
 library(brms) #for baysian model
+library(LambertW) #for Gaussianize function
 library(tidyverse)
 
 #Loading data
@@ -78,15 +79,16 @@ group_by(Date, Treatment, Time_Block)%>%
   
 #Hemocytometer data
 hemo_clean <- hemocytometer %>%
-  mutate(Tentacle_Mass_mg = (Tentacle_Mass_g*1000), Dino_Density = ((Number_Dino_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Green_Density = ((Number_Green_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Dino_MI = (Dividing_Dino_Average/Number_Dino_Average), Green_MI = (Dividing_Green_Average/Number_Green_Average)) %>%
-  mutate(Date = as.factor(Date), Treatment = as.factor(Treatment), Bin = as.factor(Bin), Anemone_ID = as.factor(Anemone_ID)) %>%
-  mutate(Date = as.POSIXct(as.character(Date),   format="%m/%d/%Y")) %>%
-  select(Date, Treatment, Bin, Anemone_ID, Tentacle_Mass_mg, Number_Dino_Average, Number_Green_Average, Dividing_Dino_Average, Dividing_Green_Average, Dino_Density, Green_Density, Dino_MI, Green_MI) %>%
+  mutate(Tentacle_Mass_mg = (Tentacle_Mass_g*1000), Dino_Density = ((Number_Dino_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Green_Density = ((Number_Green_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Dino_MI = (Dividing_Dino_Average/Number_Dino_Average)) %>%
+  mutate(Date = as.factor(Date), Treatment = as.factor(Treatment), Bin = as.factor(Bin), Site = as.factor(Site), Anemone_ID = as.factor(Anemone_ID)) %>%
+#  mutate(Date = as.POSIXct(as.character(Date),   format="%m/%d/%Y"))
+  select(Date, Treatment, Bin, Site, Anemone_ID, Tentacle_Mass_mg, Number_Dino_Average, Number_Green_Average, Dividing_Dino_Average, Dividing_Green_Average, Dino_Density, Green_Density, Dino_MI) %>%
   group_by(Date, Treatment)
 
 hemo_summary <- hemo_clean%>%
   group_by(Date, Treatment) %>%
-  summarize(mean_Dino_Density = mean(Dino_Density), se_Dino_Density = standard_error(Dino_Density), mean_Green_Density = mean(Green_Density), se_Green_Density = standard_error(Green_Density), mean_Dino_MI = mean(Dino_MI), se_Dino_MI = standard_error(Dino_MI), mean_Green_MI = mean(Green_MI), se_Green_MI = standard_error(Green_MI))
+  summarize(mean_Dino_Density = mean(Dino_Density), se_Dino_Density = standard_error(Dino_Density), mean_Green_Density = mean(Green_Density), se_Green_Density = standard_error(Green_Density), mean_Dino_MI = mean(Dino_MI), se_Dino_MI = standard_error(Dino_MI)) %>%
+  arrange(mean_Dino_MI)
   
 ```
 
@@ -476,6 +478,7 @@ fitDist(Open_Closed, data = open_closed_clean, type = "realAll", try.gamlss = T)
 
 ```
 
+## Bayesian model
 ```{r}
 #options(mc.cores=parallel::detectCores())
 bay_mod <- brm(Open_Closed ~ Treatment + Time_Block + Treatment*Time_Block, data = open_closed_clean)
@@ -505,7 +508,7 @@ p1 = ggplot(data = hemo_summary,
   geom_point(size=2.5) +
   geom_line(lwd = 1.5) +
   labs(x="Date", 
-       y = "Dinoflagellate density (cells/mg)")
+       y = "Zooxanthellae density (cells/mg)")
 
 #Mitotic Index of Dinoflagellates
 p2 = ggplot(data = hemo_summary, 
@@ -520,7 +523,7 @@ p2 = ggplot(data = hemo_summary,
   geom_point(size=2.5) +
   geom_line(lwd = 1.5) +
   labs(x="Date", 
-       y = "Dinoflagellate Mitotic Index")
+       y = "Zooxanthellae Mitotic Index")
 
 p1 + p2
 
@@ -533,4 +536,75 @@ ggsave(path = "plots",filename = "dinoflagellate_density_MI.png", width = 10, he
                               #   '#2C728EFF',
                                #  '#E65154FF'))
 ```
+
+## Testing assumptions
+```{r}
+shapiro_test(hemo_clean$Dino_Density)#p=3.169^-08
+shapiro_test(hemo_clean$Dino_MI) #p=0.0141
+
+# Log transform
+hemo_clean <- hemo_clean %>%
+  mutate(log_Dino_Density = log(Dino_Density), log_Dino_MI = log(Dino_MI + 1), arcsine_Dino_MI = asin(sqrt(Dino_MI)), sqrt_Dino_MI = sqrt(Dino_MI))
+
+hemo_black_box <- Gaussianize(hemo_clean$Dino_MI)
+
+# testing transformed data
+shapiro_test(hemo_clean$log_Dino_Density) #0.3057
+shapiro_test(hemo_clean_MI$log_Dino_MI) #0.2152
+shapiro_test(hemo_clean$arcsine_Dino_MI) #0.002478 - not normal
+shapiro_test(hemo_clean$sqrt_Dino_MI) #0.00213 - not normal
+shapiro_test(hemo_black_box$Dino_MI) #doesn't seem to work
+#Both are normal once they've been log transformed!
+
+bartlett.test(log_Dino_Density ~ Treatment, data = hemo_clean) #p=0.9133
+bartlett.test(log_Dino_MI ~ Treatment, data = hemo_clean) #0.03211
+#can assume homogeneity of variances
+
+hemo_clean %>%
+  group_by(Treatment, Date) %>%
+  identify_outliers(log_Dino_Density) #Extreme outliers: A4F at 10-31 and A60B at 11-13
+
+hemo_clean %>%
+  group_by(Treatment, Date) %>%
+  identify_outliers(log_Dino_MI) #Extreme outliers: A42S at 10-31, A13F at 11-13, A42S at 11-13
+
+ungroup(hemo_clean)
+
+```
+
+## ANOVA
+```{r}
+#Dinoflagellate density
+Dino_Density_aov <- aov(log_Dino_Density ~ Treatment*Date, data=hemo_clean)
+summary(Dino_Density_aov)
+TukeyHSD(Dino_Density_aov)
+#The significant interaction that we really care about it the significant difference between 
+#Might make a table to display significant values in our results section
+
+#Dinoflagellate mitotic index
+Dino_MI_aov <- aov(log_Dino_MI ~ Treatment*Date, data=hemo_clean)
+summary(Dino_MI_aov)
+TukeyHSD(Dino_MI_aov)
+```
+
+
+## Gamlss model
+
+Likely won't use because our data fits the assumption of normality, we're going to go ahead and use an ANOVA.
+```{r}
+descdist(hemo_clean$Dino_MI)
+
+#Testing new distribution for PAM data
+
+fitDist(Dino_MI, data = hemo_clean, type = "realAll", try.gamlss = T)
+
+#skew normal type 2 SN2 distribution is best fit
+
+histDist(hemo_clean$Dino_MI, "SN2", density = F, main = "SN2")
+```
+
+```{r}
+#Dino_MI_mod <- gamlss(Dino_MI ~ Treatment*Date, data = hemo_clean, family = SN2(), method = mixed(50, 100), control = gamlss.control(n.cyc=300))
+```
+
 
