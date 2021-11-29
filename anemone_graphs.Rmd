@@ -55,7 +55,7 @@ pam_summary <- pam_clean%>%
 #Cleaning base data
 base_clean<-base%>%
   filter(Treatment != "NA", Average_Diameter != "NA")%>% 
-  mutate(Date = factor(Date, levels =c("31-Oct", "05-Nov", "09-Nov", "13-Nov")), Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin), Site = as.factor(Site)) %>% 
+  mutate(Date = factor(Date, levels =c("31-Oct", "05-Nov", "09-Nov", "13-Nov"),), Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin), Site = as.factor(Site)) %>% 
 select(Date,Treatment,Bin,Site,Anemone_ID,Average_Diameter)
 
 base_summary <- base_clean%>%
@@ -65,8 +65,8 @@ base_summary <- base_clean%>%
 #Cleaning feeding time data
 food_clean <- food%>%
   filter(Date != "10/28/2021")%>%
-  mutate(Feeding_Time_Min = as.numeric(Feeding_Time_Min),Date = as.factor(Date), Site = as.factor(Site), Treatment = as.factor(Treatment), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin))%>%
-select(Date, Treatment, Bin, Site, Anemone_ID, Feeding_Time_Min)
+  mutate(Feeding_Time_Min = as.numeric(Feeding_Time_Min),Date = as.factor(Date), Site = as.factor(Site), Treatment = as.factor(Treatment), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin), log_Feeding_Time_Min = log(Feeding_Time_Min))%>%
+select(Date, Treatment, Bin, Site, Anemone_ID, Feeding_Time_Min, log_Feeding_Time_Min)
 
 food_summary <- food%>%
   group_by(Date, Treatment)%>%
@@ -339,6 +339,10 @@ summary(pam_mod_full2)
 
 # Base measurements
 
+```{r}
+summary(base_clean)
+```
+
 ## Plots
 
 ```{r}
@@ -442,7 +446,7 @@ shapiro.test(food_clean$Feeding_Time_Min)
 #Data is non-normal
 
 food_clean<-food_clean%>%
-  mutate(log_Feeding_Time_Min = log(Feeding_Time_Min))
+ )
 shapiro_test(food_clean$log_Feeding_Time_Min)
 #Log transformed data fits normal distribution
 
@@ -508,7 +512,6 @@ ggsave(path = "plots",filename = "open_closed_plot.png", width = 10, height = 7)
 summary(open_closed_summary)
 #Making frequency table
 table(open_closed_summary$Treatment, open_closed_summary$Open_Closed)
-
 ```
 
 
@@ -531,6 +534,7 @@ fitDist(Open_Closed, data = open_closed_clean, type = "realAll", try.gamlss = T)
 options(mc.cores=parallel::detectCores())
 #Weakly flat priors
 bay_mod <- brm(Open_Closed ~ Treatment + Time_Block + Treatment*Time_Block + (1|Anemone_ID), data = open_closed_clean, family = cumulative("logit"))
+summary(bay_mod)
 ```
 
 # Hemocytometer Data
