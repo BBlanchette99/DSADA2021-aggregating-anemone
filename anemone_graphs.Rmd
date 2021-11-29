@@ -54,9 +54,10 @@ pam_summary <- pam_clean%>%
 
 #Cleaning base data
 base_clean<-base%>%
-  filter(Treatment != "NA", Average_Diameter != "NA")%>% 
-  mutate(Date = factor(Date, levels =c("31-Oct", "05-Nov", "09-Nov", "13-Nov")), Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin), Site = as.factor(Site)) %>% 
-select(Date,Treatment,Bin,Site,Anemone_ID,Average_Diameter)
+  filter(Treatment != "NA", Average_Diameter != "NA", Anemone_ID != "A51B", Anemone_ID != "A42S", Anemone_ID != "A55B", Anemone_ID != "A59B", Anemone_ID != "A54B", Anemone_ID != "A25F")%>%
+  mutate(Date = factor(Date, levels =c("31-Oct", "05-Nov", "09-Nov", "13-Nov")), Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin), Site = as.factor(Site)) %>%
+select(Date,Treatment,Bin,Site,Anemone_ID,Average_Diameter)%>%
+   arrange_all()
 
 base_summary <- base_clean%>%
   group_by(Date, Treatment)%>%
@@ -65,8 +66,10 @@ base_summary <- base_clean%>%
 #Cleaning feeding time data
 food_clean <- food%>%
   filter(Date != "10/28/2021")%>%
-  mutate(Feeding_Time_Min = as.numeric(Feeding_Time_Min),Date = as.factor(Date), Site = as.factor(Site), Treatment = as.factor(Treatment), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin))%>%
-select(Date, Treatment, Bin, Site, Anemone_ID, Feeding_Time_Min)
+  mutate(Feeding_Time_Min = as.numeric(Feeding_Time_Min),Date = as.factor(Date), Site = as.factor(Site), Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin))%>%
+select(Date, Treatment, Bin, Site, Anemone_ID, Feeding_Time_Min)%>%
+  arrange_all()
+  
 
 food_summary <- food%>%
   group_by(Date, Treatment)%>%
@@ -93,7 +96,6 @@ hemo_summary <- hemo_clean%>%
   group_by(Date, Treatment) %>%
   summarize(mean_Dino_Density = mean(Dino_Density), se_Dino_Density = standard_error(Dino_Density), mean_Green_Density = mean(Green_Density), se_Green_Density = standard_error(Green_Density), mean_Dino_MI = mean(Dino_MI), se_Dino_MI = standard_error(Dino_MI)) %>%
   arrange(mean_Dino_MI)
-  
 ```
 
 # PAM data analysis
@@ -283,14 +285,16 @@ fitDist(Fv_Fm_av, data = pam_clean, type = "real0to1", try.gamlss = T)
 histDist(pam_clean$Fv_Fm_av, "GB1", density = F, main = "GB1")
 ```
 
+
 ## Gamlss model
 
 ```{r}
-#Gamlss model for whole-experiment PAM data (T1, T2, T8, and T9) using Gumbel distribution:
+#Gamlss model for morning measurement PAM data (T1, T2, T6, T8, and T9) using Gumbel distribution:
 
 pam_long_timeseries <- pam_clean %>% 
   filter(Measurement == "T1" | Measurement  == "T2" |Measurement == "T6"| Measurement == "T8" | Measurement == "T9")%>%
-  mutate(Measurement = fct_relevel(Measurement, "T1", "T2", "T6", "T8", "T9"))
+  mutate(Measurement = fct_relevel(Measurement, "T1", "T2", "T6", "T8", "T9"))%>%
+  arrange_all()
          
 
 fitDist(Fv_Fm_av, data = pam_long_timeseries, type = "realAll", try.gamlss = T)
@@ -315,27 +319,139 @@ summary(pam_mod)
 pam_short_timeseries <- pam_clean %>% 
   filter(Measurement == "T2" | Measurement  == "T3" |  Measurement == "T6" | Measurement == "T7")%>%
   mutate(Measurement = fct_relevel(Measurement, "T2", "T3", "T6", "T7"), Date = as.factor(Date))%>%
-select(Date, Measurement, Treatment, Anemone_ID, Fv_Fm_av, Bin, Site)
+select(Date, Measurement, Treatment, Anemone_ID, Fv_Fm_av, Bin, Site)%>%
+     arrange_all()
 
 fitDist(Fv_Fm_av, data = pam_short_timeseries, type = "realAll", try.gamlss = T)
 #Best fit: generalized beta type 1
 
-histDist(pam_short_timeseries$Fv_Fm_av, "GB1", density = F, main = "generalised beta type 1")
-
-pam_mod_full2 <- gamlss(Fv_Fm_av ~ Treatment + Measurement + Treatment*Measurement + random(as.factor(Bin)) + random(as.factor(Site)), data = pam_short_timeseries, family = GG(), method = RS(), control = gamlss.control(n.cyc=200))
-
-
-step <- stepGAIC(pam_mod_full2, direction = "backward")
-formula(step)
-step$anova
-summary(step)
 
 histDist(pam_short_timeseries$Fv_Fm_av, "GG", density = F, main = "generalised Gamma Lopatatsidis-Green")
-histDist(pam_short_timeseries$Fv_Fm_av, "GB1", density = F, main = "GB1")
 
-summary(pam_mod_full2)
+pam_mod_full2 <- gamlss(Fv_Fm_av ~ Treatment + Measurement + Treatment*Measurement + random(as.factor(Bin)) + random(as.factor(Site)), data = pam_short_timeseries, family = GG(), control = gamlss.control(n.cyc=200))
+
+
+pam_mod_2 <- stepGAIC(pam_mod_full2, direction = "backward")
+formula(step)
+summary(step)
+
+
 ```
 
+
+## Friedman test
+```{r}
+#Friedman tests on morning PAM measurements
+# On control
+pam_control <- pam_long_timeseries%>%
+  filter(Treatment == "Control")%>%
+  droplevels()
+
+pam_control %>%
+   friedman_test(Fv_Fm_av ~ Measurement |Anemone_ID)
+#Significant results! Use Wilcox test:
+pam_control%>%
+wilcox_test(Fv_Fm_av ~ Measurement, paired = TRUE, p.adjust.method = "bonferroni")
+
+#on 25C
+pam_25 <- pam_long_timeseries%>%
+  filter(Treatment == "25C")%>%
+  droplevels()
+
+pam_25 %>%
+   friedman_test(Fv_Fm_av ~ Measurement |Anemone_ID)
+#Significant results! Use Wilcox test:
+pam_25%>%
+wilcox_test(Fv_Fm_av ~ Measurement, paired = TRUE, p.adjust.method = "bonferroni")
+
+#on 30
+pam_30 <- pam_long_timeseries%>%
+  filter(Treatment == "30C")%>%
+  droplevels()
+
+pam_30 %>%
+   friedman_test(Fv_Fm_av ~ Measurement |Anemone_ID)
+#Significant results! Use Wilcox test:
+pam_30%>%
+wilcox_test(Fv_Fm_av ~ Measurement, paired = TRUE, p.adjust.method = "bonferroni")
+```
+```{r}
+#Friedman tests on heatwave PAM measurements
+# On control
+pam_control <- pam_short_timeseries%>%
+  filter(Treatment == "Control")%>%
+  droplevels()
+
+ pam_control %>%
+   friedman_test(Fv_Fm_av ~ Measurement |Anemone_ID)
+ #Significant results! Use Wilcox test:
+
+pam_control%>%
+wilcox_test(Fv_Fm_av ~ Measurement, paired = TRUE, p.adjust.method = "bonferroni")
+
+#on 25C
+pam_25 <- pam_short_timeseries%>%
+  filter(Treatment == "25C")%>%
+  droplevels()
+
+pam_25 %>%
+   friedman_test(Fv_Fm_av ~ Measurement |Anemone_ID)
+#Significant results! Use Wilcox test:
+pam_25%>%
+wilcox_test(Fv_Fm_av ~ Measurement, paired = TRUE, p.adjust.method = "bonferroni")
+
+
+#on 30
+pam_30 <- pam_short_timeseries%>%
+  filter(Treatment == "30C")%>%
+  droplevels()
+
+pam_30 %>%
+   friedman_test(Fv_Fm_av ~ Measurement |Anemone_ID)
+#Significant results! Use Wilcox test:
+
+pam_30%>%
+wilcox_test(Fv_Fm_av ~ Measurement, paired = TRUE, p.adjust.method = "bonferroni")
+```
+## Kruskall Wallis tests
+```{r}
+#KW test on morning pam measurements at each time point
+#Nov 1 measurement:
+  kruskal.test(Fv_Fm_av~Treatment, data = filter( pam_long_timeseries, Measurement == "T1"))
+#No significant results
+
+#Nov 6 measurement:
+  kruskal.test(Fv_Fm_av~Treatment, data = filter( pam_long_timeseries, Measurement == "T2"))
+#Significant results! Use Dunn test:
+  dunn_test(Fv_Fm_av~Treatment, data = filter( pam_long_timeseries, Measurement == "T2"))
+
+#Nov 8 measurement:
+  kruskal.test(Fv_Fm_av~Treatment, data = filter( pam_long_timeseries, Measurement == "T6"))
+#No significant results
+
+#Nov 9 measurement:
+  kruskal.test(Fv_Fm_av~Treatment, data = filter( pam_long_timeseries, Measurement == "T8"))
+#No significant results
+  
+#Nov 13 measurement:
+  kruskal.test(Fv_Fm_av~Treatment, data = filter( pam_long_timeseries, Measurement == "T9"))
+#No significant results
+```
+
+
+```{r}
+#KW test on heatwave PAM measurements. Only afternoon measurements are analyzed, because morning timepoints were analyzed in the previous section.
+
+#Nov 6 post-heat measurement:
+  kruskal.test(Fv_Fm_av~Treatment, data = filter( pam_short_timeseries, Measurement == "T3"))
+#Significant results! Use Dunn test:
+dunn_test(Fv_Fm_av~Treatment, data = filter( pam_short_timeseries, Measurement == "T3"))
+
+#Nov 8 post-heat measurement:
+  kruskal.test(Fv_Fm_av~Treatment, data = filter( pam_short_timeseries, Measurement == "T7"))
+#Significant results! Use Dunn test:
+  dunn_test(Fv_Fm_av~Treatment, data = filter( pam_short_timeseries, Measurement == "T7"))
+```
 
 # Base measurements
 
@@ -408,6 +524,60 @@ AIC(base_mod_1, base_mod_2)
 summary(base_mod_2)
 ```
 
+## Friedman tests
+```{r}
+#Friedman tests comparing each treatment over all timepoints
+# On control
+base_control <- base_clean%>%
+  filter(Treatment == "Control")%>%
+  droplevels()
+
+table(base_control$Date, base_control$Anemone_ID)
+
+base_control %>%
+   friedman_test(Average_Diameter ~ Date |Anemone_ID)
+#No significant results
+
+#on 25C
+base_25 <-base_clean%>%
+  filter(Treatment == "25C")%>%
+  droplevels()
+
+base_25 %>%
+   friedman_test(Average_Diameter ~ Date |Anemone_ID)
+#No significant results
+
+#on 30
+base_30 <- base_clean%>%
+  filter(Treatment == "30C")%>%
+  droplevels()
+
+base_30 %>%
+   friedman_test(Average_Diameter ~ Date |Anemone_ID)
+#No significant results
+```
+## Kruskal-Wallis tests
+```{r}
+#KW test on all treatments at each of the four timepoints
+#Oct. 31 measurements:
+  kruskal.test(Average_Diameter~Treatment, data = filter( base_clean, Date == "31-Oct"))
+#No significant results
+
+#Nov 5 measurements
+kruskal.test(Average_Diameter~Treatment, data = filter( base_clean, Date == "05-Nov"))
+#No significant results
+
+#Nov 9 measurements
+kruskal.test(Average_Diameter~Treatment, data = filter( base_clean, Date == "09-Nov"))
+#No significant results
+
+#Nov 9 measurements
+kruskal.test(Average_Diameter~Treatment, data = filter( base_clean, Date == "13-Nov"))
+#No significant results
+```
+
+
+
 # Feeding time
 
 ## Plots
@@ -475,7 +645,7 @@ histDist(food_clean$Feeding_Time_Min, "LNO", density = F, main = "Box-Cox")
 
 food_mod_1 <- gamlss(Feeding_Time_Min ~ Treatment*Date + random(Anemone_ID), data = food_clean, family = LNO())
 
-#Use test because no errors and better AIC
+#Use log transformation because no errors and better AIC
 food_mod_2 <- gamlss(log_Feeding_Time_Min ~ Treatment*Date + random(Anemone_ID), data = food_clean, family = NO())
 
 GAIC(food_mod_1, food_mod_2)
@@ -484,6 +654,61 @@ GAIC(food_mod_1, food_mod_2)
 summary(food_mod_2)
 
 ```
+
+## Friedman tests
+```{r}
+#Friedman tests comparing each treatment over all timepoints
+# On control
+food_control <- food_clean%>%
+  filter(Treatment == "Control")%>%
+  droplevels()
+
+food_control %>%
+   friedman_test(Feeding_Time_Min ~ Date |Anemone_ID)
+#Significant results - perform Wilcox test
+
+food_control%>%
+wilcox_test(Feeding_Time_Min ~ Date, paired = TRUE, p.adjust.method = "bonferroni")
+#No combinations have significant results
+
+#on 25C
+food_25 <-food_clean%>%
+  filter(Treatment == "25C")%>%
+  droplevels()
+
+food_25 %>%
+   friedman_test(Feeding_Time_Min ~ Date |Anemone_ID)
+#No significant results
+
+#on 30
+food_30 <- food_clean%>%
+  filter(Treatment == "30C")%>%
+  droplevels()
+
+food_30 %>%
+   friedman_test(Feeding_Time_Min ~ Date |Anemone_ID)
+#No significant results
+```
+## KW tests
+```{R}
+#KW test on all treatments at each of the four timepoints
+#Oct. 31 measurements:
+  kruskal.test(Feeding_Time_Min~Treatment, data = filter( food_clean, Date == "11/01/2021"))
+#No significant results
+
+#Nov 5 measurements
+kruskal.test(Feeding_Time_Min~Treatment, data = filter( food_clean, Date == "11/05/2021"))
+#No significant results
+
+#Nov 9 measurements
+kruskal.test(Feeding_Time_Min~Treatment, data = filter(food_clean, Date == "11/09/2021"))
+#No significant results
+
+#Nov 9 measurements
+kruskal.test(Feeding_Time_Min~Treatment, data = filter(food_clean, Date == "11/13/2021"))
+#No significant results
+```
+
 
 # Open/closed measurements
 
