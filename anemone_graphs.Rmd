@@ -54,9 +54,10 @@ pam_summary <- pam_clean%>%
 
 #Cleaning base data
 base_clean<-base%>%
-  filter(Treatment != "NA", Average_Diameter != "NA", Anemone_ID != "A51B", Anemone_ID != "A42S", Anemone_ID != "A55B", Anemone_ID != "A59B", Anemone_ID != "A54B", Anemone_ID != "A25F")%>%
-  mutate(Date = factor(Date, levels =c("31-Oct", "05-Nov", "09-Nov", "13-Nov")), Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin), Site = as.factor(Site)) %>%
-select(Date,Treatment,Bin,Site,Anemone_ID,Average_Diameter)%>%
+  filter(Treatment != "NA", Average_Diameter != "NA")%>%
+   droplevels()%>%
+  mutate(Date = factor(Date, levels =c("31-Oct", "05-Nov", "09-Nov", "13-Nov")), Event = fct_relevel(as.factor(Event), "Initial","Before heatwave", "After heatwave", "Recovery"),Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin), Site = as.factor(Site)) %>%
+select(Date,Event,Treatment,Bin,Site,Anemone_ID,Average_Diameter)%>%
    arrange_all()
 
 base_summary <- base_clean%>%
@@ -66,8 +67,8 @@ base_summary <- base_clean%>%
 #Cleaning feeding time data
 food_clean <- food%>%
   filter(Date != "10/28/2021")%>%
-  mutate(Feeding_Time_Min = as.numeric(Feeding_Time_Min),Date = as.factor(Date), Site = as.factor(Site), Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin))%>%
-select(Date, Treatment, Bin, Site, Anemone_ID, Feeding_Time_Min)%>%
+  mutate(Feeding_Time_Min = as.numeric(Feeding_Time_Min),Event = fct_relevel(as.factor(Event),"Initial", "Before heatwave", "After heatwave", "Recovery"),Date = as.factor(Date), Site = as.factor(Site), Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin))%>%
+select(Date, Event,Treatment, Bin, Site, Anemone_ID, Feeding_Time_Min)%>%
   arrange_all()
 
 
@@ -295,6 +296,9 @@ pam_long_timeseries <- pam_clean %>%
   filter(Measurement == "T1" | Measurement  == "T2" |Measurement == "T6"| Measurement == "T8" | Measurement == "T9")%>%
   mutate(Measurement = fct_relevel(Measurement, "T1", "T2", "T6", "T8", "T9"))%>%
   arrange_all()
+
+shapiro_test(pam_long_timeseries$transformed_Fv_Fm)
+bartlett.test(transformed_Fv_Fm ~ Treatment, data = pam_long_timeseries)
          
 
 fitDist(Fv_Fm_av, data = pam_long_timeseries, type = "realAll", try.gamlss = T)
@@ -332,8 +336,8 @@ pam_mod_full2 <- gamlss(Fv_Fm_av ~ Treatment + Measurement + Treatment*Measureme
 
 
 pam_mod_2 <- stepGAIC(pam_mod_full2, direction = "backward")
-formula(step)
-summary(step)
+formula(pam_mod_2)
+summary(pam_mod_2)
 
 
 ```
@@ -462,10 +466,10 @@ summary(base_clean)
 ## Plots
 
 ```{r}
-ggplot(base_clean, aes(fill = Treatment, x=Date, y = Average_Diameter)) + 
+ggplot(base_clean, aes(fill = Treatment, x=Event, y = Average_Diameter)) + 
         theme_classic() +
          geom_boxplot() +
-labs(x = "Date", Y = "Base diameter (mm)") +
+labs(x = "Measurement time", y = "Base diameter (mm)") +
   scale_fill_manual(values = c('#89226AFF',
                               '#2C728EFF',    
                               '#E65154FF')) +
@@ -499,14 +503,14 @@ base_clean %>%
 ## ANOVA tests - delete later if not using
 
 ```{r}
-base_aov <- anova_test(data = base_clean, dv = log_diameter, wid = Anemone_ID, within = c(Treatment, Date))
+base_aov <- aov(log_diameter ~ Treatment*Date + random(Anemone_ID), data=base_clean)
+summary(base_aov)
+TukeyHSD(base_aov)
 
-test_aov <- aov(log_diameter ~ Treatment*Date + Error(Anemone_ID/(Treatment*Date)), data=base_clean)
 
-test_aov2<-ezANOVA(data = base_clean, dv = .(log_diameter), wid = .(Anemone_ID), within = c(Treatment, Date))
-
-summary(test_aov)
-table(base_clean$Treatment, base_clean$Date)
+Dino_Density_aov <- aov(log_Dino_Density ~ Treatment*Date, data=hemo_clean)
+summary(Dino_Density_aov)
+TukeyHSD(Dino_Density_aov)
 ```
 
 ## Gamlss model
@@ -595,10 +599,10 @@ ggplot(data = food_summary, aes(x=Date, y = mean_time, group = Treatment, colour
         geom_errorbar(aes(ymin = mean_time- se_time, ymax = mean_time + se_time), width=0.2)
 
 #Boxplot of feeding time
-ggplot(food_clean, aes(fill = Treatment, x=Date, y = Feeding_Time_Min)) + 
+ggplot(food_clean, aes(fill = Treatment, x=Event, y = Feeding_Time_Min)) + 
         theme_classic() +
          geom_boxplot() +
-  labs(x = "Date", Y = "Feeding time (min)") +
+  labs(x = "Measurement time", y = "Feeding time (min)") +
   scale_fill_manual(values = c('#89226AFF',
                               '#2C728EFF',    
                               '#E65154FF')) +
@@ -616,7 +620,6 @@ shapiro.test(food_clean$Feeding_Time_Min)
 #Data is non-normal
 
 food_clean<-food_clean%>%
- )
 shapiro_test(food_clean$log_Feeding_Time_Min)
 #Log transformed data fits normal distribution
 
@@ -632,7 +635,9 @@ food_clean %>%
 ## ANOVA - delete if not using
 
 ```{r}
-food_aov <- anova_test(data = food_clean, dv = log_Feeding_Time_Min, wid = Anemone_ID, within = c(Treatment, Date))
+food_aov <- aov(log_Feeding_Time_Min ~ Treatment*Date + random(Anemone_ID), data=food_clean)
+summary(food_aov)
+TukeyHSD(food_aov)
 
 
 test <- gamlss(log_Feeding_Time_Min ~ Treatment*Date + random(Anemone_ID),  data = food_clean)
@@ -722,11 +727,16 @@ kruskal.test(Feeding_Time_Min~Treatment, data = filter(food_clean, Date == "11/1
 ggplot(data = open_closed_summary, aes(x = Time_Block, y = n, fill = Open_Closed)) + 
   geom_bar(position = "fill", stat = "identity") + 
   facet_grid(Date ~ Treatment) +
-  labs(x="Time (hours)", y = "Proportion") +
+  labs(x="Time (hours)", y = "Proportion", fill = "Behaviour") +
   theme_classic()+
 scale_fill_manual(values = c('#89226AFF',
                               '#2C728EFF',    
-                              '#E65154FF')) 
+                              '#E65154FF'))+
+  theme(strip.text.x = element_text(size = 15),
+       axis.text=element_text(size=15),
+        axis.title=element_text(size=20), 
+        legend.text=element_text(size=15), 
+        legend.title=element_text(size=20))
 ggsave(path = "plots",filename = "open_closed_plot.png", width = 10, height = 7)
 ```
 
@@ -736,7 +746,8 @@ ggsave(path = "plots",filename = "open_closed_plot.png", width = 10, height = 7)
 #Summarizing the data
 summary(open_closed_summary)
 #Making frequency table
-table(open_closed_summary$Treatment, open_closed_summary$Open_Closed)
+table(open_closed_clean$Treatment, open_closed_clean$Open_Closed)
+
 ```
 
 
@@ -756,10 +767,11 @@ fitDist(Open_Closed, data = open_closed_clean, type = "realAll", try.gamlss = T)
 
 ## Bayesian model
 ```{r}
-options(mc.cores=parallel::detectCores())
+#options(mc.cores=parallel::detectCores())
 #Weakly flat priors
-bay_mod <- brm(Open_Closed ~ Treatment + Time_Block + Treatment*Time_Block + (1|Anemone_ID), data = open_closed_clean, family = cumulative("logit"))
+bay_mod<- brm(Open_Closed ~ Treatment + Time_Block + Date + Treatment*Time_Block*Date + (1|Anemone_ID), data = open_closed_clean, family = cumulative("logit"))
 summary(bay_mod)
+
 ```
 
 # Hemocytometer Data
