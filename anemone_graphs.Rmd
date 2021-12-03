@@ -123,10 +123,10 @@ ggplot(data = pam_summary,
   labs(x="Date", 
        y = "Photosynthetic efficiency (Fv/Fm)") +
   scale_fill_manual(values = c('#89226AFF',
-                              '#2C728EFF',    
+                              '#56B4E9',    
                               '#E65154FF')) +
   scale_colour_manual(values = c('#89226AFF',
-                                 '#2C728EFF',
+                                 '#56B4E9',
                                  '#E65154FF'))+
   theme(axis.text=element_text(size=15),
         axis.title=element_text(size=20), 
@@ -161,8 +161,8 @@ ggplot(data = p1_data,
                     width=30000)+
   labs(x="Date", 
        y = "Photosynthetic efficiency (Fv/Fm)") +
-  scale_fill_manual(values = c('#89226AFF', '#2C728EFF','#E65154FF'))+
-  scale_colour_manual(values = c('#89226AFF', '#2C728EFF','#E65154FF'))+
+  scale_fill_manual(values = c('#89226AFF', '#56B4E9','#E65154FF'))+
+  scale_colour_manual(values = c('#89226AFF', '#56B4E9','#E65154FF'))+
   theme(axis.text=element_text(size=15),
         axis.title=element_text(size=20), 
         legend.text=element_text(size=15), 
@@ -207,10 +207,10 @@ geom_errorbar(aes(ymin = mean_FvFm - se_FvFm,
 labs(x="Date", 
      y = "Photosynthetic efficiency (Fv/Fm)") +
 scale_fill_manual(values = c('#89226AFF',
-                             '#2C728EFF',           
+                             '#56B4E9',           
                              '#E65154FF')) +
 scale_colour_manual(values = c('#89226AFF', 
-                               '#2C728EFF', 
+                               '#56B4E9', 
                               '#E65154FF'))+
   theme(axis.text=element_text(size=30),
         axis.title=element_text(size=35), 
@@ -235,7 +235,7 @@ pam_heatwave<-pam_clean%>%
 
 ggplot(pam_heatwave, aes(fill=Treatment, y=Fv_Fm_av, x=Time)) + 
   geom_boxplot() +
- scale_fill_manual(values = c('#89226AFF','#2C728EFF','#E65154FF')) +
+ scale_fill_manual(values = c('#89226AFF','#56B4E9','#E65154FF')) +
    labs(x = "Measurement time", y = "Photosynthetic efficiency (Fv/Fm)")+
   facet_grid(.~Day) +
   theme_classic() +
@@ -470,7 +470,7 @@ ggplot(base_clean, aes(fill = Treatment, x=Event, y = Average_Diameter)) +
          geom_boxplot() +
 labs(x = "Measurement time", y = "Base diameter (mm)") +
   scale_fill_manual(values = c('#89226AFF',
-                              '#2C728EFF',    
+                              '#56B4E9',    
                               '#E65154FF')) +
   theme(axis.text=element_text(size=15),
         axis.title=element_text(size=20), 
@@ -603,7 +603,7 @@ ggplot(food_clean, aes(fill = Treatment, x=Event, y = Feeding_Time_Min)) +
          geom_boxplot() +
   labs(x = "Measurement time", y = "Feeding time (min)") +
   scale_fill_manual(values = c('#89226AFF',
-                              '#2C728EFF',    
+                              '#56B4E9',    
                               '#E65154FF')) +
   theme(axis.text=element_text(size=15),
         axis.title=element_text(size=20), 
