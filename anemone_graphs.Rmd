@@ -318,7 +318,7 @@ summary(pam_mod)
 #Trying a gamlss model on PAM data (T2, T3, T6, T7), using GB1 distribution:
 pam_short_timeseries <- pam_clean %>% 
   filter(Measurement == "T2" | Measurement  == "T3" |  Measurement == "T6" | Measurement == "T7")%>%
-  mutate(Measurement = fct_relevel(Measurement, "T2", "T3", "T6", "T7"), Date = as.factor(Date),)%>%
+  mutate(Measurement = fct_relevel(Measurement, "T2", "T3", "T6", "T7"), Date = as.factor(Date))%>%
 select(Date, Measurement, Treatment, Anemone_ID, Fv_Fm_av, Bin, Site)%>%
      arrange_all()
 
