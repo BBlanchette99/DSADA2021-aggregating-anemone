@@ -318,7 +318,7 @@ summary(pam_mod)
 #Trying a gamlss model on PAM data (T2, T3, T6, T7), using GB1 distribution:
 pam_short_timeseries <- pam_clean %>% 
   filter(Measurement == "T2" | Measurement  == "T3" |  Measurement == "T6" | Measurement == "T7")%>%
-  mutate(Measurement = fct_relevel(Measurement, "T2", "T3", "T6", "T7"), Date = as.factor(Date))%>%
+  mutate(Measurement = fct_relevel(Measurement, "T2", "T3", "T6", "T7"), Date = as.factor(Date),)%>%
 select(Date, Measurement, Treatment, Anemone_ID, Fv_Fm_av, Bin, Site)%>%
      arrange_all()
 
@@ -758,7 +758,7 @@ fitDist(Open_Closed, data = open_closed_clean, type = "realAll", try.gamlss = T)
 ```{r}
 options(mc.cores=parallel::detectCores())
 #Weakly flat priors
-bay_mod <- brm(Open_Closed ~ Treatment + Time_Block + Treatment*Time_Block + (1|Anemone_ID), data = open_closed_clean, family = cumulative("logit"))
+bay_mod <- brm(Open_Closed ~ Treatment + Time_Block + Date + Treatment*Time_Block*Date + (1|Anemone_ID), data = open_closed_clean, family = cumulative("logit"))
 summary(bay_mod)
 ```
 
