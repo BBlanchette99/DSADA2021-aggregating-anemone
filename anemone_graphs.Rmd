@@ -153,8 +153,8 @@ ggplot(data = p1_data,
   geom_vline(xintercept = as.POSIXct("2021-11-08 16:00:00"), 
              linetype = "dotted", 
              size = 1)+
-  geom_point(size=2.5) +
-  geom_line(lwd = 1.5) +
+  geom_point(size=3) +
+  geom_line(lwd = 2) +
  scale_x_datetime(breaks=date_breaks("3 days"),labels=date_format("%b-%d"))+
   geom_errorbar(aes(ymin = mean_FvFm - se_FvFm, 
                     ymax = mean_FvFm + se_FvFm), 
@@ -795,13 +795,12 @@ p1 <- ggplot(data = hemo_summary,
   geom_vline(xintercept = as.POSIXct("2021-11-08 16:00:00"), 
              linetype = "dotted", 
              size = 1)+
-  geom_point(size=2.5) +
-  geom_line(lwd = 1.5) +
-  scale_fill_manual(values = c('#89226AFF',
-                              '#2C728EFF',    
-                              '#E65154FF')) +
+  geom_point(size=3) +
+  geom_line(lwd = 2) +
+  scale_fill_manual(values =c('#89226AFF',
+   '#56B4E9FF',                            '#E65154FF')) +
   scale_colour_manual(values = c('#89226AFF',
-                                 '#2C728EFF',
+                                 '#56B4E9FF',
                                  '#E65154FF'))+
   labs(x="Date", 
        y = "Zooxanthellae density (cells/mg)")+
@@ -819,8 +818,8 @@ p2 = ggplot(data = hemo_summary,
   geom_errorbar(aes(ymin = mean_Dino_MI - se_Dino_MI, 
                     ymax = mean_Dino_MI + se_Dino_MI), 
                    width=30000) +
-  geom_point(size=2.5) +
-  geom_line(lwd = 1.5) +
+  geom_point(size=3) +
+  geom_line(lwd = 2) +
   geom_vline(xintercept = as.POSIXct("2021-11-06 09:00:00"),
              linetype = "dotted", 
              size = 1) +
@@ -828,10 +827,10 @@ p2 = ggplot(data = hemo_summary,
              linetype = "dotted", 
              size = 1)+
    scale_fill_manual(values = c('#89226AFF',
-                              '#2C728EFF',    
+                              '#56B4E9FF',    
                               '#E65154FF')) +
   scale_colour_manual(values = c('#89226AFF',
-                                 '#2C728EFF',
+                                 '#56B4E9FF',
                                  '#E65154FF'))+
   labs(x="Date", 
        y = "Zooxanthellae Mitotic Index")+
