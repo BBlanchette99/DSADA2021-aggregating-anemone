@@ -89,14 +89,13 @@ group_by(Date, Treatment, Time_Block)%>%
 hemo_clean <- hemocytometer %>%
   mutate(Tentacle_Mass_mg = (Tentacle_Mass_g*1000), Dino_Density = ((Number_Dino_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Green_Density = ((Number_Green_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Dino_MI = (Dividing_Dino_Average/Number_Dino_Average)) %>%
   mutate(Date = as.factor(Date), Treatment = as.factor(Treatment), Bin = as.factor(Bin), Site = as.factor(Site), Anemone_ID = as.factor(Anemone_ID)) %>%
-#  mutate(Date = as.POSIXct(as.character(Date),   format="%m/%d/%Y"))
+  mutate(Date = as.POSIXct(as.character(Date),   format="%m/%d/%Y")) %>%
   select(Date, Treatment, Bin, Site, Anemone_ID, Tentacle_Mass_mg, Number_Dino_Average, Number_Green_Average, Dividing_Dino_Average, Dividing_Green_Average, Dino_Density, Green_Density, Dino_MI) %>%
   group_by(Date, Treatment)
 
 hemo_summary <- hemo_clean%>%
   group_by(Date, Treatment) %>%
-  summarize(mean_Dino_Density = mean(Dino_Density), se_Dino_Density = standard_error(Dino_Density), mean_Green_Density = mean(Green_Density), se_Green_Density = standard_error(Green_Density), mean_Dino_MI = mean(Dino_MI), se_Dino_MI = standard_error(Dino_MI)) %>%
-  arrange(mean_Dino_MI)
+  summarize(mean_Dino_Density = mean(Dino_Density), se_Dino_Density = standard_error(Dino_Density), mean_Green_Density = mean(Green_Density), se_Green_Density = standard_error(Green_Density), mean_Dino_MI = mean(Dino_MI), se_Dino_MI = standard_error(Dino_MI))
 ```
 
 # PAM data analysis
@@ -729,7 +728,7 @@ ggplot(data = open_closed_summary, aes(x = Time_Block, y = n, fill = Open_Closed
   facet_grid(Date ~ Treatment) +
   labs(x="Time (hours)", y = "Proportion", fill = "Behaviour") +
   theme_classic()+
-scale_fill_manual(values = c('#89226AFF',
+scale_fill_manual(values = c('#FFE082',
                               '#2C728EFF',    
                               '#E65154FF'))+
   theme(strip.text.x = element_text(size = 15),
@@ -814,12 +813,6 @@ p1 + p2
 
 ggsave(path = "plots",filename = "dinoflagellate_density_MI.png", width = 10, height = 4)
 
-  #scale_fill_manual(values = c('#89226AFF',
-                            #  '#2C728EFF',    
-                             # '#E65154FF')) +
-  #scale_colour_manual(values = c('#89226AFF',
-                              #   '#2C728EFF',
-                               #  '#E65154FF'))
 ```
 
 ## Testing assumptions
