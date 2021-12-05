@@ -1,11 +1,12 @@
 ---
-title: "PAM_analysis"
-author: "Caitlin Bergman"
+title: "Aggregating anemone data analysis"
+author: "Caitlin Bergman and Beth Blanchette"
 date: "11/11/2021"
 output: html_document
 ---
 Loading libraries and data
 ```{r}
+#loading libraries
 library(rstatix) #Used for anova_test function
 library(DHARMa)
 library(fitdistrplus)#Used to fit distributions to data
@@ -28,7 +29,6 @@ hemocytometer <- read_delim("data/hemocytometer_data_clean.csv", delim = ",")
 ```
 
 # Cleaning data
-
 ```{r}
 #Creating a clean dataframe for each response variable, and a summarized dataframe with average value for each treatment at each measurement time
 
@@ -660,7 +660,6 @@ GAIC(food_mod_1, food_mod_2)
 #food_mod_2 (using log-transformed data) has lower AIC and is therefore a better fit for the data.
 
 summary(food_mod_2)
-
 ```
 
 ## Friedman tests
@@ -769,9 +768,25 @@ fitDist(Open_Closed, data = open_closed_clean, type = "realAll", try.gamlss = T)
 #options(mc.cores=parallel::detectCores())
 #Weakly flat priors
 
-bay_mod <- brm(Open_Closed ~ Treatment + Time_Block + Date + Treatment*Time_Block*Date + (1|Anemone_ID), data = open_closed_clean, family = cumulative("logit"))
+
+bay_mod <- brm(Open_Closed ~ Treatment + Time_Block + Date + (1|Anemone_ID), data = open_closed_clean, family = cumulative("logit"))
+
 
 summary(bay_mod)
+response_post = posterior_samples(bay_mod)
+sum(response_post$b_Treatment30C > 0) / 4000 # 0.82275
+sum(response_post$b_Treatment25C > 0) / 4000 # 0.2765
+sum(response_post$b_Time_Block1 > 0) / 4000 # 0.888
+sum(response_post$b_Time_Block2 > 0) / 4000 #0.9975
+sum(response_post$b_Time_Block3 > 0) / 4000 # 0.88
+sum(response_post$b_Time_Block4 > 0) / 4000 # 0.99875
+sum(response_post$b_Time_Block5 > 0) / 4000 # 1
+sum(response_post$b_Time_Block6 > 0) / 4000 # 1
+sum(response_post$b_Date11D7D2021 > 0) / 4000 # 0.17525
+sum(response_post$b_Date11D8D2021 > 0) / 4000 # 0.42775
+
+
+
 
 ```
 
@@ -855,7 +870,7 @@ hemo_black_box <- Gaussianize(hemo_clean$Dino_MI)
 
 # testing transformed data
 shapiro_test(hemo_clean$log_Dino_Density) #0.3057
-shapiro_test(hemo_clean_MI$log_Dino_MI) #0.2152
+shapiro_test(hemo_clean$log_Dino_MI) #0.2152
 shapiro_test(hemo_clean$arcsine_Dino_MI) #0.002478 - not normal
 shapiro_test(hemo_clean$sqrt_Dino_MI) #0.00213 - not normal
 shapiro_test(hemo_black_box$Dino_MI) #doesn't seem to work
@@ -875,8 +890,8 @@ hemo_clean %>%
 
 ungroup(hemo_clean)
 
-```
 
+```
 ## ANOVA
 ```{r}
 #Dinoflagellate density
@@ -905,7 +920,7 @@ fitDist(Dino_MI, data = hemo_clean, type = "realAll", try.gamlss = T)
 
 #skew normal type 2 SN2 distribution is best fit
 
-histDist(hemo_clean$Dino_MI, "SN2", density = F, main = "SN2")
+histDist(hemo_clean$Dino_MI , "SN2", density = F, main = "SN2")
 ```
 
 ```{r}
