@@ -1,0 +1,1 @@
+This directory contains all data (raw and manipulated) used for the Directed Studies project. Each measurement that was collected is in a separate data file, including photosynthetic efficiency, cell density and mitotic index, anemone base diameter, anemone feeding time, and behavioural response measurements.
