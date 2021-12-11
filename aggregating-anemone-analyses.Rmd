@@ -4,7 +4,7 @@ author: "Caitlin Bergman and Beth Blanchette"
 date: "11/11/2021"
 output: html_document
 ---
-Loading libraries and data
+## Loading libraries and data
 ```{r}
 #loading libraries
 library(rstatix) #Used for anova_test function
@@ -208,7 +208,6 @@ ggplot(pam_heatwave, aes(fill=Treatment, y=Fv_Fm_av, x=Time)) +
         
 ggsave(path = "plots",filename = "pam_heatwave_boxplot.png", width = 15, height = 7)
 ```
-
 
 ## Analysis of photosynthetic efficiency data
 
@@ -831,7 +830,7 @@ hemo_clean %>%
 
 Two-way AVOVA on zooxanthellae density data:
 ```{r}
-Dino_Density_aov <- aov(log_Dino_Density ~ Treatment*as.factor(Date), data=hemo_clean)
+Dino_Density_aov <- aov(log_Dino_Density ~ Treatment*as.factor(Date) + random(Anemone_ID), data=hemo_clean)
 summary(Dino_Density_aov)
 TukeyHSD(Dino_Density_aov)
 ```
@@ -846,30 +845,28 @@ bartlett.test(Dino_MI ~ Treatment, data = hemo_clean)
 
 # Trying transformations:
 hemo_clean <- hemo_clean %>%
-  mutate(log_Dino_MI = log(Dino_MI + 1), arcsine_Dino_MI = asin(sqrt(Dino_MI)), sqrt_Dino_MI = sqrt(Dino_MI))
+  mutate(log_Dino_MI = log(Dino_MI + 0.1), arcsine_Dino_MI = asin(sqrt(Dino_MI)), sqrt_Dino_MI = sqrt(Dino_MI))
 
-hemo_black_box <- Gaussianize(hemo_clean$Dino_MI)
-
-# testing transformed data
-shapiro_test(hemo_clean$log_Dino_MI) #0.2152
-shapiro_test(hemo_clean$arcsine_Dino_MI) #0.002478 - not normal
-shapiro_test(hemo_clean$sqrt_Dino_MI) #0.00213 - not normal
-shapiro_test(hemo_black_box) #doesn't seem to work
-#None are normal after transformation
+# Testing normality of transformed data
+shapiro_test(hemo_clean$log_Dino_MI) 
+shapiro_test(hemo_clean$arcsine_Dino_MI) 
+shapiro_test(hemo_clean$sqrt_Dino_MI) 
+#Arcsin and square root tranformations are not normal, but the log transformed data is.
 
 bartlett.test(log_Dino_MI ~ Treatment, data = hemo_clean) #0.03211
-#can assume homogeneity of variances
+#log transformed data has equal variances
 
 hemo_clean %>%
   group_by(Treatment, Date) %>%
-  identify_outliers(log_Dino_MI) #Extreme outliers: A42S at 10-31, A13F at 11-13, A42S at 11-13
+  identify_outliers(log_Dino_MI) 
+#The data has three extreme outliers, but this will not have a major effect on the results. We will use an two-way ANOVA on the log transformed data.
 
 ungroup(hemo_clean)
 ```
 Two-way ANOVA on mitotic index data:
 ```{r}
 #Dinoflagellate mitotic index
-Dino_MI_aov <- aov(log_Dino_MI ~ Treatment*as.factor(Date), data=hemo_clean)
+Dino_MI_aov <- aov(log_Dino_MI ~ Treatment*as.factor(Date) + random(Anemone_ID), data=hemo_clean)
 summary(Dino_MI_aov)
 TukeyHSD(Dino_MI_aov)
 ```
