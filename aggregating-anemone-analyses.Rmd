@@ -16,7 +16,7 @@ library(ordinal)#For ordinal regression
 library(performance)
 library(scales)
 library(gamlss) # For gamlss models
-library(brms) #for baysian model
+library(brms) #for bayesian model
 library(LambertW) #for Gaussianize function
 library(tidyverse)
 
@@ -35,9 +35,9 @@ hemocytometer <- read_delim("data/hemocytometer_data_clean.csv", delim = ",")
 #Function to calculate standard error for data summaries
 standard_error <- function(x) sd(x) / sqrt(length(x))
 
-#Cleaning photosynthetic efficiency data: Filtering to remove measurements that were not used during analysis, formatting columns, and selecting columns needed for model.
+#Cleaning photosynthetic efficiency data: Filtering to remove measurements that were not used during analysis due to technical errors, formatting columns, and selecting columns needed for model.
 pam_clean <- pam %>%
-  filter(Measurement != "NA")%>% #Removing dates with PAM measurements that we are not using due to technical errors
+  filter(Measurement != "NA")%>%
   select(Date,Time,Measurement,Treatment,Bin,Site,Anemone_ID,Fv_Fm_av)%>%
   mutate(Date = as.POSIXct(as.character(Date),
                            format="%m/%d/%Y %H:%M:%S"),
@@ -53,9 +53,9 @@ pam_summary <- pam_clean%>%
   group_by(Date, Measurement, Treatment) %>%
   summarize(mean_FvFm = mean(Fv_Fm_av), se_FvFm = standard_error(Fv_Fm_av))
 
-#Cleaning base measurement data: Filtering to remove measurements that were not used during analysis, formatting columns, and selecting columns needed for model.
+#Cleaning base measurement data: Filtering to remove measurements that were not used during analysis (not inlcuded in experiment or not attached during measurement), formatting columns, and selecting columns needed for model.
 base_clean<-base%>%
-  filter(Treatment != "NA", Average_Diameter != "NA")%>% #Removing measurements from anemones that were not included in experiment, and anemones that were not attached during measurements
+  filter(Treatment != "NA", Average_Diameter != "NA")%>%
    droplevels()%>%
   mutate(Date = factor(Date, levels =c("31-Oct", "05-Nov", "09-Nov", "13-Nov")), Event = fct_relevel(as.factor(Event), "Initial","Before heatwave", "After heatwave", "Recovery"),Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin), Site = as.factor(Site)) %>%
 select(Date,Event,Treatment,Bin,Site,Anemone_ID,Average_Diameter)%>%
@@ -88,9 +88,9 @@ open_closed_summary <- open_closed_clean %>%
 group_by(Date, Treatment, Time_Block)%>%
   count(Open_Closed)
   
-#Cleaning hemocytometer data: Converting units for mass to mg, calculating cell densities and mitotic index, formatting columns, and selecting columns needed for model.
+#Cleaning hemocytometer data: Converting units for mass to mg, calculating cell densities and mitotic index, formatting columns, and selecting columns needed for model. Cell density (in cells/mg of tentacle tissue) calculated from cell counts and tentacle mass; mitotic index calculated as the proportion of dividing cells out of the total number of cells.
 hemo_clean <- hemocytometer %>%
-  mutate(Tentacle_Mass_mg = (Tentacle_Mass_g*1000), Dino_Density = ((Number_Dino_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Green_Density = ((Number_Green_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Dino_MI = (Dividing_Dino_Average/Number_Dino_Average)) %>% #Cell density (in cells/mg of tentacle tissue) calculated from cell counts and tentacle mass; mitotic index calculated as the proportion of dividing cells out of the total number of cells
+  mutate(Tentacle_Mass_mg = (Tentacle_Mass_g*1000), Dino_Density = ((Number_Dino_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Green_Density = ((Number_Green_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Dino_MI = (Dividing_Dino_Average/Number_Dino_Average)) %>%
   mutate(Date = as.factor(Date), Treatment = as.factor(Treatment), Bin = as.factor(Bin), Site = as.factor(Site), Anemone_ID = as.factor(Anemone_ID)) %>%
 mutate(Date = as.POSIXct(as.character(Date),   format="%m/%d/%Y"))%>%
   select(Date, Treatment, Bin, Site, Anemone_ID, Tentacle_Mass_mg, Number_Dino_Average, Number_Green_Average, Dividing_Dino_Average, Dividing_Green_Average, Dino_Density, Green_Density, Dino_MI) %>%
