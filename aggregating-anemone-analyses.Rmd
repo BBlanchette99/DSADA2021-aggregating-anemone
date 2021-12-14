@@ -24,7 +24,7 @@ library(tidyverse)
 pam<-read_delim("data/pam_data.csv", delim = ",")
 base <- read_delim("data/base_diameter_data.csv", delim = ",")
 food <- read_delim("data/feeding_time_data.csv", delim = ",")
-open_closed <- read_delim("data/open_closed_data.csv", delim = ",")
+open_closed <- read_delim("data/heatwave_data.csv", delim = ",")
 hemocytometer <- read_delim("data/hemocytometer_data_clean.csv", delim = ",")
 ```
 
