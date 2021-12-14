@@ -4,6 +4,7 @@ author: "Caitlin Bergman and Beth Blanchette"
 date: "11/11/2021"
 output: html_document
 ---
+
 ## Loading libraries and data
 ```{r}
 #loading libraries
@@ -81,11 +82,11 @@ food_summary <- food %>%
 #Cleaning heatwave response data: Formatting columns and selecting columns needed for model.
 open_closed_clean <- open_closed %>%
   mutate(Date = as.factor(Date),Anemone_ID = as.factor(Anemone_ID),Time_Block = fct_relevel(as.factor(Time_Block), "0", "1", "2", "3", "4", "5", "6"), Treatment = as.factor(Treatment),  Open_Closed = as.factor(Open_Closed), Open_Closed = factor(Open_Closed, levels = c("Open", "Partially open", "Closed"), ordered = TRUE), Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))%>%
-  dplyr::select(Date, Time_Block,Bin, Treatment, Open_Closed, Anemone_ID)
+  select(Date,Event, Time_Block,Bin, Treatment, Open_Closed, Anemone_ID)
 
 #Counts of heatwave response data for each treatment and measurement time
 open_closed_summary <- open_closed_clean %>%
-group_by(Date, Treatment, Time_Block)%>%
+group_by(Date, Event,Treatment, Time_Block)%>%
   count(Open_Closed)
   
 #Cleaning hemocytometer data: Converting units for mass to mg, calculating cell densities and mitotic index, formatting columns, and selecting columns needed for model.
@@ -100,6 +101,14 @@ mutate(Date = as.POSIXct(as.character(Date),   format="%m/%d/%Y"))%>%
 hemo_summary <- hemo_clean%>%
   group_by(Date, Treatment) %>%
   summarize(mean_Dino_Density = mean(Dino_Density), se_Dino_Density = standard_error(Dino_Density), mean_Green_Density = mean(Green_Density), se_Green_Density = standard_error(Green_Density), mean_Dino_MI = mean(Dino_MI), se_Dino_MI = standard_error(Dino_MI))
+
+#Summarizing mean and standard error of temperature data from heatwave
+temp_summary <- open_closed %>%
+  select(Date, Time_Block,Event, Treatment, Bucket_Temp) %>%
+  group_by(Date, Event, Treatment, Time_Block) %>%
+  summarize(mean_temp = mean(Bucket_Temp), se_temp = standard_error(Bucket_Temp))%>%
+  mutate(Date = as.factor(Date), Treatment = as.factor(Treatment)) %>%
+  mutate(Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))
 ```
 
 # PAM data analysis
@@ -127,11 +136,10 @@ ggplot(data = pam_summary,
                     width=30000)+
   labs(x="Date", 
        y = "Photosynthetic efficiency (Fv/Fm)") +
-  scale_fill_manual(values = c('#89226AFF',
-                              '#2C728EFF',    
-                              '#E65154FF')) +
+  scale_fill_manual(values =c('#89226AFF',
+   '#56B4E9FF',                            '#E65154FF')) +
   scale_colour_manual(values = c('#89226AFF',
-                                 '#2C728EFF',
+                                 '#56B4E9FF',
                                  '#E65154FF'))+
   theme(axis.text=element_text(size=15),
         axis.title=element_text(size=20), 
@@ -168,8 +176,12 @@ ggplot(data = pam_morning,
                     width=30000)+
   labs(x="Date", 
        y = "Photosynthetic efficiency (Fv/Fm)") +
-  scale_fill_manual(values = c('#89226AFF', '#2C728EFF','#E65154FF'))+
-  scale_colour_manual(values = c('#89226AFF', '#2C728EFF','#E65154FF'))+
+  scale_fill_manual(values =c('#89226AFF',
+                              '#56B4E9FF', 
+                              '#E65154FF')) +
+  scale_colour_manual(values = c('#89226AFF',
+                                 '#56B4E9FF',
+                                 '#E65154FF'))+
   theme(axis.text=element_text(size=15),
         axis.title=element_text(size=20), 
         legend.text=element_text(size=15), 
@@ -196,7 +208,9 @@ pam_heatwave<-pam_clean%>%
 #Plotting data as two boxplots, separated by day. Each boxplot is separated by time (before/after heatwave) and treatment.
 ggplot(pam_heatwave, aes(fill=Treatment, y=Fv_Fm_av, x=Time)) + 
   geom_boxplot() +
- scale_fill_manual(values = c('#89226AFF','#2C728EFF','#E65154FF')) +
+ scale_fill_manual(values =c('#89226AFF',
+                              '#56B4E9FF', 
+                              '#E65154FF')) +
    labs(x = "Measurement time", y = "Photosynthetic efficiency (Fv/Fm)")+
   facet_grid(.~Day) +
   theme_classic() +
@@ -307,120 +321,6 @@ summary(pam_heatwave_mod_final)
 #Final model includes Treatment, Date, Treatment * Date, random(Bin), and random(Site)
 ```
 
-
-## DELETE IF NOT USING - Friedman test
-```{r}
-#Friedman tests on morning PAM measurements
-# On control
-pam_control <- pam_morning_timeseries%>%
-  filter(Treatment == "Control")%>%
-  droplevels()
-
-pam_control %>%
-   friedman_test(Fv_Fm_av ~ Measurement |Anemone_ID)
-#Significant results! Use Wilcox test:
-pam_control%>%
-wilcox_test(Fv_Fm_av ~ Measurement, paired = TRUE, p.adjust.method = "bonferroni")
-
-#on 25C
-pam_25 <- pam_morning_timeseries%>%
-  filter(Treatment == "25C")%>%
-  droplevels()
-
-pam_25 %>%
-   friedman_test(Fv_Fm_av ~ Measurement |Anemone_ID)
-#Significant results! Use Wilcox test:
-pam_25%>%
-wilcox_test(Fv_Fm_av ~ Measurement, paired = TRUE, p.adjust.method = "bonferroni")
-
-#on 30
-pam_30 <- pam_morning_timeseries%>%
-  filter(Treatment == "30C")%>%
-  droplevels()
-
-pam_30 %>%
-   friedman_test(Fv_Fm_av ~ Measurement |Anemone_ID)
-#Significant results! Use Wilcox test:
-pam_30%>%
-wilcox_test(Fv_Fm_av ~ Measurement, paired = TRUE, p.adjust.method = "bonferroni")
-```
-```{r}
-#Friedman tests on heatwave PAM measurements
-# On control
-pam_control <- pam_short_timeseries%>%
-  filter(Treatment == "Control")%>%
-  droplevels()
-
- pam_control %>%
-   friedman_test(Fv_Fm_av ~ Measurement |Anemone_ID)
- #Significant results! Use Wilcox test:
-
-pam_control%>%
-wilcox_test(Fv_Fm_av ~ Measurement, paired = TRUE, p.adjust.method = "bonferroni")
-
-#on 25C
-pam_25 <- pam_short_timeseries%>%
-  filter(Treatment == "25C")%>%
-  droplevels()
-
-pam_25 %>%
-   friedman_test(Fv_Fm_av ~ Measurement |Anemone_ID)
-#Significant results! Use Wilcox test:
-pam_25%>%
-wilcox_test(Fv_Fm_av ~ Measurement, paired = TRUE, p.adjust.method = "bonferroni")
-
-
-#on 30
-pam_30 <- pam_short_timeseries%>%
-  filter(Treatment == "30C")%>%
-  droplevels()
-
-pam_30 %>%
-   friedman_test(Fv_Fm_av ~ Measurement |Anemone_ID)
-#Significant results! Use Wilcox test:
-
-pam_30%>%
-wilcox_test(Fv_Fm_av ~ Measurement, paired = TRUE, p.adjust.method = "bonferroni")
-```
-## DELETE IF NOT USING - Kruskall Wallis tests 
-```{r}
-#KW test on morning pam measurements at each time point
-#Nov 1 measurement:
-  kruskal.test(Fv_Fm_av~Treatment, data = filter( pam_morning_timeseries, Measurement == "T1"))
-#No significant results
-
-#Nov 6 measurement:
-  kruskal.test(Fv_Fm_av~Treatment, data = filter( pam_morning_timeseries, Measurement == "T2"))
-#Significant results! Use Dunn test:
-  dunn_test(Fv_Fm_av~Treatment, data = filter( pam_morning_timeseries, Measurement == "T2"))
-
-#Nov 8 measurement:
-  kruskal.test(Fv_Fm_av~Treatment, data = filter( pam_morning_timeseries, Measurement == "T6"))
-#No significant results
-
-#Nov 9 measurement:
-  kruskal.test(Fv_Fm_av~Treatment, data = filter( pam_morning_timeseries, Measurement == "T8"))
-#No significant results
-  
-#Nov 13 measurement:
-  kruskal.test(Fv_Fm_av~Treatment, data = filter( pam_morning_timeseries, Measurement == "T9"))
-#No significant results
-```
-
-```{r}
-#KW test on heatwave PAM measurements. Only afternoon measurements are analyzed, because morning timepoints were analyzed in the previous section.
-
-#Nov 6 post-heat measurement:
-  kruskal.test(Fv_Fm_av~Treatment, data = filter( pam_short_timeseries, Measurement == "T3"))
-#Significant results! Use Dunn test:
-dunn_test(Fv_Fm_av~Treatment, data = filter( pam_short_timeseries, Measurement == "T3"))
-
-#Nov 8 post-heat measurement:
-  kruskal.test(Fv_Fm_av~Treatment, data = filter( pam_short_timeseries, Measurement == "T7"))
-#Significant results! Use Dunn test:
-  dunn_test(Fv_Fm_av~Treatment, data = filter( pam_short_timeseries, Measurement == "T7"))
-```
-
 # Base measurement analysis
 
 ## Plots
@@ -431,8 +331,8 @@ ggplot(base_clean, aes(fill = Treatment, x=Event, y = Average_Diameter)) +
         theme_classic() +
          geom_boxplot() +
 labs(x = "Measurement time", y = "Base diameter (mm)") +
-  scale_fill_manual(values = c('#89226AFF',
-                              '#2C728EFF',    
+  scale_fill_manual(values =c('#89226AFF',
+                              '#56B4E9FF', 
                               '#E65154FF')) +
   theme(axis.text=element_text(size=15),
         axis.title=element_text(size=20), 
@@ -470,92 +370,9 @@ summary(base_aov)
 TukeyHSD(base_aov)
 ```
 
-## DELETE IF NOT USING - Gamlss model 
-
-```{r}
-
-fitDist(Average_Diameter, data = base_clean, type = "realAll", try.gamlss = T)
-#Best fit: Box-Cox (LNO)
-
-histDist(base_clean$Average_Diameter, "LNO", density = F, main = "Box-Cox")
-
-base_mod_1 <- gamlss(Average_Diameter ~ Treatment*Date, data = base_clean, family = LNO())
-
-base_mod_2 <- gamlss(log_diameter ~ Treatment*Date + random(Anemone_ID), data = base_clean, family = NO())
-
-AIC(base_mod_1, base_mod_2)
-#base_mod_2 (using the log-transformed data) has a lower AIC and therefore is a better fit for the data. 
-
-summary(base_mod_2)
-```
-
-## DELETE IF NOT USING - Friedman tests
-```{r}
-#Friedman tests comparing each treatment over all timepoints
-# On control
-base_control <- base_clean%>%
-  filter(Treatment == "Control")%>%
-  droplevels()
-
-table(base_control$Date, base_control$Anemone_ID)
-
-base_control %>%
-   friedman_test(Average_Diameter ~ Date |Anemone_ID)
-#No significant results
-
-#on 25C
-base_25 <-base_clean%>%
-  filter(Treatment == "25C")%>%
-  droplevels()
-
-base_25 %>%
-   friedman_test(Average_Diameter ~ Date |Anemone_ID)
-#No significant results
-
-#on 30
-base_30 <- base_clean%>%
-  filter(Treatment == "30C")%>%
-  droplevels()
-
-base_30 %>%
-   friedman_test(Average_Diameter ~ Date |Anemone_ID)
-#No significant results
-```
-## DELETE IF NOT USING - Kruskal-Wallis tests
-```{r}
-#KW test on all treatments at each of the four timepoints
-#Oct. 31 measurements:
-  kruskal.test(Average_Diameter~Treatment, data = filter( base_clean, Date == "31-Oct"))
-#No significant results
-
-#Nov 5 measurements
-kruskal.test(Average_Diameter~Treatment, data = filter( base_clean, Date == "05-Nov"))
-#No significant results
-
-#Nov 9 measurements
-kruskal.test(Average_Diameter~Treatment, data = filter( base_clean, Date == "09-Nov"))
-#No significant results
-
-#Nov 9 measurements
-kruskal.test(Average_Diameter~Treatment, data = filter( base_clean, Date == "13-Nov"))
-#No significant results
-```
-
-
-
 # Feeding time
 
 ## Plots
-
-Line graph of feeding time for each treatment with standard error bars:
-```{r}
-ggplot(data = food_summary, aes(x=Date, y = mean_time, group = Treatment, colour = Treatment)) + 
-        theme_classic() +
-         geom_point() +
-        geom_line() +
-        geom_errorbar(aes(ymin = mean_time- se_time, ymax = mean_time + se_time), width=0.2)
-ggsave(path = "plots",filename = "food_line.png", width = 10, height = 7)
-```
 
 Boxplot of feeding time data for each treatment and measurement time:
 ```{r}
@@ -563,8 +380,8 @@ ggplot(food_clean, aes(fill = Treatment, x=Event, y = Feeding_Time_Min)) +
         theme_classic() +
          geom_boxplot() +
   labs(x = "Measurement time", y = "Feeding time (min)") +
-  scale_fill_manual(values = c('#89226AFF',
-                              '#2C728EFF',    
+  scale_fill_manual(values =c('#89226AFF',
+                              '#56B4E9FF', 
                               '#E65154FF')) +
   theme(axis.text=element_text(size=15),
         axis.title=element_text(size=20), 
@@ -600,80 +417,6 @@ summary(food_aov)
 TukeyHSD(food_aov)
 ```
 
-
-## DELETE IF NOT USING - Gamlss models
-```{r}
-fitDist(Feeding_Time_Min, data = food_clean, type = "realAll", try.gamlss = T)
-#Best fit: Box-Cox (LNO)
-
-histDist(food_clean$Feeding_Time_Min, "LNO", density = F, main = "Box-Cox")
-
-food_mod_1 <- gamlss(Feeding_Time_Min ~ Treatment*Date + random(Anemone_ID), data = food_clean, family = LNO())
-
-#Use log transformation because no errors and better AIC
-food_mod_2 <- gamlss(log_Feeding_Time_Min ~ Treatment*Date + random(Anemone_ID), data = food_clean, family = NO())
-
-GAIC(food_mod_1, food_mod_2)
-#food_mod_2 (using log-transformed data) has lower AIC and is therefore a better fit for the data.
-
-summary(food_mod_2)
-```
-
-## DELETE IF NOT USING - Friedman tests
-```{r}
-#Friedman tests comparing each treatment over all timepoints
-# On control
-food_control <- food_clean%>%
-  filter(Treatment == "Control")%>%
-  droplevels()
-
-food_control %>%
-   friedman_test(Feeding_Time_Min ~ Date |Anemone_ID)
-#Significant results - perform Wilcox test
-
-food_control%>%
-wilcox_test(Feeding_Time_Min ~ Date, paired = TRUE, p.adjust.method = "bonferroni")
-#No combinations have significant results
-
-#on 25C
-food_25 <-food_clean%>%
-  filter(Treatment == "25C")%>%
-  droplevels()
-
-food_25 %>%
-   friedman_test(Feeding_Time_Min ~ Date |Anemone_ID)
-#No significant results
-
-#on 30
-food_30 <- food_clean%>%
-  filter(Treatment == "30C")%>%
-  droplevels()
-
-food_30 %>%
-   friedman_test(Feeding_Time_Min ~ Date |Anemone_ID)
-#No significant results
-```
-## DELETE IF NOT USING - KW tests
-```{R}
-#KW test on all treatments at each of the four timepoints
-#Oct. 31 measurements:
-  kruskal.test(Feeding_Time_Min~Treatment, data = filter( food_clean, Date == "11/01/2021"))
-#No significant results
-
-#Nov 5 measurements
-kruskal.test(Feeding_Time_Min~Treatment, data = filter( food_clean, Date == "11/05/2021"))
-#No significant results
-
-#Nov 9 measurements
-kruskal.test(Feeding_Time_Min~Treatment, data = filter(food_clean, Date == "11/09/2021"))
-#No significant results
-
-#Nov 9 measurements
-kruskal.test(Feeding_Time_Min~Treatment, data = filter(food_clean, Date == "11/13/2021"))
-#No significant results
-```
-
-
 # Heatwave response data analysis
 
 ## Plots
@@ -682,13 +425,14 @@ Creating a stacked bar plot showing proportions of open, closed, and partially o
 ```{r}
 ggplot(data = open_closed_summary, aes(x = Time_Block, y = n, fill = Open_Closed)) + 
   geom_bar(position = "fill", stat = "identity") + 
-  facet_grid(Date ~ Treatment) +
+  facet_grid(Event ~ Treatment) +
   labs(x="Time (hours)", y = "Proportion", fill = "Behaviour") +
   theme_classic()+
 scale_fill_manual(values = c('#FFE082',
                               '#2C728EFF',    
                               '#E65154FF'))+
   theme(strip.text.x = element_text(size = 15),
+        strip.text.y = element_text(size= 15),
        axis.text=element_text(size=15),
         axis.title=element_text(size=20), 
         legend.text=element_text(size=15), 
@@ -807,7 +551,7 @@ p1 + p2
 ggsave(path = "plots",filename = "dinoflagellate_density_MI.png", width = 10, height = 4)
 ```
 
-## NEED TO FIGURE OUT MI NORMALITY - Analyzing data
+## Analyzing zooxanthellae density and mitotic index
 
 ### Zooxanthellae density
 ```{r}
@@ -871,22 +615,33 @@ summary(Dino_MI_aov)
 TukeyHSD(Dino_MI_aov)
 ```
 
+# Heatwave temperature plot
 
-## DELETE LATER - Gamlss model
-
-Likely won't use because our data fits the assumption of normality, we're going to go ahead and use an ANOVA.
+Creating a plot to show the average temperature in the final 3 hours of the heatwave (after the temperature ramp) on each day
 ```{r}
-descdist(hemo_clean$Dino_MI)
-
-#Testing new distribution for PAM data
-
-fitDist(Dino_MI, data = hemo_clean, type = "realAll", try.gamlss = T)
-
-#skew normal type 2 SN2 distribution is best fit
-
-histDist(hemo_clean$Dino_MI , "SN2", density = F, main = "SN2")
+ggplot(data = temp_summary,
+       aes(x=Time_Block, 
+           y = mean_temp,
+           group=Treatment,
+           colour = Treatment))+
+  theme_classic() +
+  geom_point(size=2.5) +
+  geom_line(lwd = 1.5) +
+   facet_grid(Event ~ .) +
+  scale_fill_manual(values = c('#89226AFF',
+                              '#56B4E9FF',    
+                              '#E65154FF')) +
+  scale_colour_manual(values = c('#89226AFF',
+                                 '#56B4E9FF',
+                                 '#E65154FF'))+
+  labs(x="Time (Hours)", 
+       y = "Temperature (°C)") +
+  theme(strip.text.y = element_text(size = 15),
+       axis.text=element_text(size=15),
+        axis.title=element_text(size=20), 
+        legend.text=element_text(size=15), 
+        legend.title=element_text(size=20))
+  
+ggsave(path = "plots",filename = "temp_plot.png", width = 10, height = 7)
 ```
 
-```{r}
-#Dino_MI_mod <- gamlss(Dino_MI ~ Treatment*Date, data = hemo_clean, family = SN2(), method = mixed(50, 100), control = gamlss.control(n.cyc=300))
-```
