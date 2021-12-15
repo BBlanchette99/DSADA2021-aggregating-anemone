@@ -14,21 +14,21 @@ knitr::opts_chunk$set(tidy.opts=list(width.cutoff=80), tidy=TRUE)
 ## Loading libraries and data
 ```{r, message = F, warning = F}
 #loading libraries
-library(rstatix) #Used for anova_test function
-library(fitdistrplus) #Used to fit distributions to data
-library(patchwork)#for making pretty figures
-library(ordinal)#For ordinal regression
+library(rstatix)
+library(fitdistrplus) 
+library(patchwork)
+library(ordinal)
 library(performance)
 library(scales)
-library(gamlss) # For gamlss models
-library(brms) #for baysian model
+library(gamlss)
+library(brms) 
 library(tidyverse)
 
 #Loading data
-pam<-read_delim("data/pam_data.csv", delim = ",")
-base <- read_delim("data/base_diameter_data.csv", delim = ",")
-food <- read_delim("data/feeding_time_data.csv", delim = ",")
-open_closed <- read_delim("data/open_closed_data.csv", delim = ",")
+pam<-read_delim("data/pam_data_clean.csv", delim = ",")
+base <- read_delim("data/base_diameter_data_clean.csv", delim = ",")
+food <- read_delim("data/feeding_time_data_clean.csv", delim = ",")
+open_closed <- read_delim("data/open_closed_data_clean.csv", delim = ",")
 hemocytometer <- read_delim("data/hemocytometer_data_clean.csv", delim = ",")
 ```
 
@@ -43,14 +43,14 @@ standard_error <- function(x) sd(x) / sqrt(length(x))
 #during analysis, formatting columns, and selecting columns needed for model.
 pam_clean <- pam %>%
   filter(Measurement != "NA")%>% 
-  select(Date,Time,Measurement,Treatment,Bin,Site,Anemone_ID,Fv_Fm_av)%>%
+  select(Date,Event,Measurement,Treatment,Bin,Site,Anemone_ID,Fv_Fm_av)%>%
   mutate(Date = as.POSIXct(as.character(Date),
                            format="%m/%d/%Y %H:%M:%S"),
          Anemone_ID = as.factor(Anemone_ID), 
          Bin = as.factor(Bin), 
          Measurement = as.factor(Measurement), 
          Site = as.factor(Site), 
-         Time = factor(Time, levels = c("Pre-heat", "Post-heat")),
+         Event = factor(Event, levels = c("Acclimation","Pre-heat", "Post-heat", "Recovery")),
          Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"))
 
 #Mean and standard error of photosynthetic efficiency for each treatment and measurement time
@@ -65,7 +65,7 @@ base_clean<-base%>%
   filter(Treatment != "NA", 
          Average_Diameter != "NA")%>% 
   mutate(Date = factor(Date, levels =c("31-Oct", "05-Nov", "09-Nov", "13-Nov")), 
-         Event = fct_relevel(as.factor(Event), "Initial","Before heatwave", "After heatwave", "Recovery"),
+         Event = fct_relevel(as.factor(Event), "Acclimation","Before heatwave", "After heatwave", "Recovery"),
          Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), 
          Anemone_ID = as.factor(Anemone_ID), 
          Bin = as.factor(Bin), 
@@ -83,8 +83,8 @@ base_summary <- base_clean%>%
 #analysis, formatting columns, and selecting columns needed for model.
 food_clean <- food%>%
   filter(Date != "10/28/2021")%>%
-  mutate(Feeding_Time_Min = as.numeric(Feeding_Time_Min),
-         Event = fct_relevel(as.factor(Event),"Initial", "Before heatwave", "After heatwave", "Recovery"),
+  mutate(Feeding_Time_Min = as.numeric(Feeding_Min),
+         Event = fct_relevel(as.factor(Event),"Acclimation", "Before heatwave", "After heatwave", "Recovery"),
          Date = as.factor(Date),
          Site = as.factor(Site),
          Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), 
@@ -248,7 +248,7 @@ pam_heatwave<-pam_clean%>%
 ggplot(pam_heatwave, 
        aes(fill=Treatment, 
            y=Fv_Fm_av, 
-           x=Time)) + 
+           x=Event)) + 
   geom_boxplot() +
  scale_fill_manual(values =c('#89226AFF','#56B4E9FF','#E65154FF')) +
    labs(x = "Measurement time", 
