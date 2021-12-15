@@ -2,23 +2,26 @@
 title: "Aggregating anemone data analysis"
 author: "Caitlin Bergman and Beth Blanchette"
 date: "11/11/2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=80), tidy=TRUE)
+```
+
 ## Loading libraries and data
-```{r}
+```{r, message = F, warning = F}
 #loading libraries
 library(rstatix) #Used for anova_test function
-library(DHARMa)
-library(fitdistrplus)#Used to fit distributions to data
-library(goft)
+library(fitdistrplus) #Used to fit distributions to data
 library(patchwork)#for making pretty figures
 library(ordinal)#For ordinal regression
 library(performance)
 library(scales)
 library(gamlss) # For gamlss models
 library(brms) #for baysian model
-library(LambertW) #for Gaussianize function
 library(tidyverse)
 
 #Loading data
@@ -30,15 +33,16 @@ hemocytometer <- read_delim("data/hemocytometer_data_clean.csv", delim = ",")
 ```
 
 # Cleaning data
-```{r}
-#Creating a clean dataframe for each response variable, and a summarized dataframe with average value for each treatment at each measurement time
+```{r, message = F, warning = F}
+#Creating a clean dataframe for each response variable, and a summarized dataframe with average #value for each treatment at each measurement time
 
 #Function to calculate standard error for data summaries
 standard_error <- function(x) sd(x) / sqrt(length(x))
 
-#Cleaning photosynthetic efficiency data: Filtering to remove measurements that were not used during analysis, formatting columns, and selecting columns needed for model.
+#Cleaning photosynthetic efficiency data: Filtering to remove measurements that were not used 
+#during analysis, formatting columns, and selecting columns needed for model.
 pam_clean <- pam %>%
-  filter(Measurement != "NA")%>% #Removing dates with PAM measurements that we are not using due to technical errors
+  filter(Measurement != "NA")%>% 
   select(Date,Time,Measurement,Treatment,Bin,Site,Anemone_ID,Fv_Fm_av)%>%
   mutate(Date = as.POSIXct(as.character(Date),
                            format="%m/%d/%Y %H:%M:%S"),
@@ -52,25 +56,40 @@ pam_clean <- pam %>%
 #Mean and standard error of photosynthetic efficiency for each treatment and measurement time
 pam_summary <- pam_clean%>%
   group_by(Date, Measurement, Treatment) %>%
-  summarize(mean_FvFm = mean(Fv_Fm_av), se_FvFm = standard_error(Fv_Fm_av))
+  summarize(mean_FvFm = mean(Fv_Fm_av), 
+            se_FvFm = standard_error(Fv_Fm_av))
 
-#Cleaning base measurement data: Filtering to remove measurements that were not used during analysis, formatting columns, and selecting columns needed for model.
+#Cleaning base measurement data: Filtering to remove measurements that were not used during 
+#analysis, formatting columns, and selecting columns needed for model.
 base_clean<-base%>%
-  filter(Treatment != "NA", Average_Diameter != "NA")%>% #Removing measurements from anemones that were not included in experiment, and anemones that were not attached during measurements
-   droplevels()%>%
-  mutate(Date = factor(Date, levels =c("31-Oct", "05-Nov", "09-Nov", "13-Nov")), Event = fct_relevel(as.factor(Event), "Initial","Before heatwave", "After heatwave", "Recovery"),Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin), Site = as.factor(Site)) %>%
+  filter(Treatment != "NA", 
+         Average_Diameter != "NA")%>% 
+  mutate(Date = factor(Date, levels =c("31-Oct", "05-Nov", "09-Nov", "13-Nov")), 
+         Event = fct_relevel(as.factor(Event), "Initial","Before heatwave", "After heatwave", "Recovery"),
+         Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), 
+         Anemone_ID = as.factor(Anemone_ID), 
+         Bin = as.factor(Bin), 
+         Site = as.factor(Site)) %>%
 select(Date,Event,Treatment,Bin,Site,Anemone_ID,Average_Diameter)%>%
    arrange_all()
 
 #Mean and standard error of base measurement data for each treatment and measurement time
 base_summary <- base_clean%>%
   group_by(Date, Treatment)%>%
-  summarize(mean_base = mean(Average_Diameter), se_base = standard_error(Average_Diameter))
+  summarize(mean_base = mean(Average_Diameter), 
+            se_base = standard_error(Average_Diameter))
 
-#Cleaning feeding time data: Filtering to remove measurements that were not used during analysis, formatting columns, and selecting columns needed for model.
+#Cleaning feeding time data: Filtering to remove measurements that were not used during 
+#analysis, formatting columns, and selecting columns needed for model.
 food_clean <- food%>%
   filter(Date != "10/28/2021")%>%
-  mutate(Feeding_Time_Min = as.numeric(Feeding_Time_Min),Event = fct_relevel(as.factor(Event),"Initial", "Before heatwave", "After heatwave", "Recovery"),Date = as.factor(Date), Site = as.factor(Site), Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), Anemone_ID = as.factor(Anemone_ID), Bin = as.factor(Bin))%>%
+  mutate(Feeding_Time_Min = as.numeric(Feeding_Time_Min),
+         Event = fct_relevel(as.factor(Event),"Initial", "Before heatwave", "After heatwave", "Recovery"),
+         Date = as.factor(Date),
+         Site = as.factor(Site),
+         Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), 
+         Anemone_ID = as.factor(Anemone_ID), 
+         Bin = as.factor(Bin))%>%
 select(Date, Event,Treatment, Bin, Site, Anemone_ID, Feeding_Time_Min)
 
 #Mean and standard error of feeding time data for each treatment and measurement time
@@ -81,33 +100,56 @@ food_summary <- food %>%
 
 #Cleaning heatwave response data: Formatting columns and selecting columns needed for model.
 open_closed_clean <- open_closed %>%
-  mutate(Date = as.factor(Date),Anemone_ID = as.factor(Anemone_ID),Time_Block = fct_relevel(as.factor(Time_Block), "0", "1", "2", "3", "4", "5", "6"), Treatment = as.factor(Treatment),  Open_Closed = as.factor(Open_Closed), Open_Closed = factor(Open_Closed, levels = c("Open", "Partially open", "Closed"), ordered = TRUE), Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))%>%
-  select(Date,Event, Time_Block,Bin, Treatment, Open_Closed, Anemone_ID)
+  mutate(Date = as.factor(Date),
+         Anemone_ID = as.factor(Anemone_ID),
+         Time_Block = fct_relevel(as.factor(Time_Block), "0", "1", "2", "3", "4", "5", "6"), 
+         Treatment = as.factor(Treatment),  
+         Open_Closed = as.factor(Open_Closed), 
+         Open_Closed = factor(Open_Closed, levels = c("Open", "Partially open", "Closed"), ordered = TRUE), 
+         Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))%>%
+  select(Date, Event, Time_Block,Bin, Treatment, Open_Closed, Anemone_ID)
 
 #Counts of heatwave response data for each treatment and measurement time
 open_closed_summary <- open_closed_clean %>%
-group_by(Date, Event,Treatment, Time_Block)%>%
+group_by(Date, Event, Treatment, Time_Block)%>%
   count(Open_Closed)
   
-#Cleaning hemocytometer data: Converting units for mass to mg, calculating cell densities and mitotic index, formatting columns, and selecting columns needed for model.
+#Cleaning hemocytometer data: Converting units for mass to mg, calculating cell densities and 
+#mitotic index, formatting columns, and selecting columns needed for model. 
 hemo_clean <- hemocytometer %>%
-  mutate(Tentacle_Mass_mg = (Tentacle_Mass_g*1000), Dino_Density = ((Number_Dino_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Green_Density = ((Number_Green_Average*0.5)/(Tentacle_Mass_mg*0.0001)), Dino_MI = (Dividing_Dino_Average/Number_Dino_Average)) %>% #Cell density (in cells/mg of tentacle tissue) calculated from cell counts and tentacle mass; mitotic index calculated as the proportion of dividing cells out of the total number of cells
-  mutate(Date = as.factor(Date), Treatment = as.factor(Treatment), Bin = as.factor(Bin), Site = as.factor(Site), Anemone_ID = as.factor(Anemone_ID)) %>%
-mutate(Date = as.POSIXct(as.character(Date),   format="%m/%d/%Y"))%>%
-  select(Date, Treatment, Bin, Site, Anemone_ID, Tentacle_Mass_mg, Number_Dino_Average, Number_Green_Average, Dividing_Dino_Average, Dividing_Green_Average, Dino_Density, Green_Density, Dino_MI) %>%
+  mutate(Tentacle_Mass_mg = (Tentacle_Mass_g*1000), 
+         Dino_Density = ((Number_Dino_Average*0.5)/(Tentacle_Mass_mg*0.0001)), 
+         Green_Density = ((Number_Green_Average*0.5)/(Tentacle_Mass_mg*0.0001)), 
+         Dino_MI = (Dividing_Dino_Average/Number_Dino_Average)) %>% 
+  mutate(Date = as.factor(Date), 
+         Treatment = as.factor(Treatment), 
+         Bin = as.factor(Bin), Site = as.factor(Site), 
+         Anemone_ID = as.factor(Anemone_ID)) %>%
+mutate(Date = as.POSIXct(as.character(Date),format="%m/%d/%Y"))%>%
+  select(Date,Treatment, Bin, Site, Anemone_ID, Tentacle_Mass_mg, Number_Dino_Average, 
+         Number_Green_Average, Dividing_Dino_Average, Dividing_Green_Average, Dino_Density, 
+         Green_Density, Dino_MI) %>%
   group_by(Date, Treatment)
 
-#Mean and standard error of cell density and mitotic index for zooxanthellae and zoochlorellae at each treatment and measurement time
+#Mean and standard error of cell density and mitotic index for zooxanthellae and zoochlorellae 
+#at each treatment and measurement time
 hemo_summary <- hemo_clean%>%
   group_by(Date, Treatment) %>%
-  summarize(mean_Dino_Density = mean(Dino_Density), se_Dino_Density = standard_error(Dino_Density), mean_Green_Density = mean(Green_Density), se_Green_Density = standard_error(Green_Density), mean_Dino_MI = mean(Dino_MI), se_Dino_MI = standard_error(Dino_MI))
+  summarize(mean_Dino_Density = mean(Dino_Density), 
+            se_Dino_Density = standard_error(Dino_Density), 
+            mean_Green_Density = mean(Green_Density), 
+            se_Green_Density = standard_error(Green_Density), 
+            mean_Dino_MI = mean(Dino_MI), 
+            se_Dino_MI = standard_error(Dino_MI))
 
 #Summarizing mean and standard error of temperature data from heatwave
 temp_summary <- open_closed %>%
   select(Date, Time_Block,Event, Treatment, Bucket_Temp) %>%
   group_by(Date, Event, Treatment, Time_Block) %>%
-  summarize(mean_temp = mean(Bucket_Temp), se_temp = standard_error(Bucket_Temp))%>%
-  mutate(Date = as.factor(Date), Treatment = as.factor(Treatment)) %>%
+  summarize(mean_temp = mean(Bucket_Temp), 
+            se_temp = standard_error(Bucket_Temp))%>%
+  mutate(Date = as.factor(Date), 
+         Treatment = as.factor(Treatment)) %>%
   mutate(Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))
 ```
 
@@ -115,7 +157,7 @@ temp_summary <- open_closed %>%
 
 ## Plots
 Plotting a timeseries including all photosynthetic efficiency measurement times
-```{r}
+```{r, message = F, warning = F}
 #Plotting measurements as a timeseries with standard error bars. 
 ggplot(data = pam_summary, 
        aes(x=Date, 
@@ -136,11 +178,8 @@ ggplot(data = pam_summary,
                     width=30000)+
   labs(x="Date", 
        y = "Photosynthetic efficiency (Fv/Fm)") +
-  scale_fill_manual(values =c('#89226AFF',
-   '#56B4E9FF',                            '#E65154FF')) +
-  scale_colour_manual(values = c('#89226AFF',
-                                 '#56B4E9FF',
-                                 '#E65154FF'))+
+  scale_fill_manual(values =c('#89226AFF','#56B4E9FF','#E65154FF')) +
+  scale_colour_manual(values = c('#89226AFF','#56B4E9FF','#E65154FF'))+
   theme(axis.text=element_text(size=15),
         axis.title=element_text(size=20), 
         legend.text=element_text(size=15), 
@@ -150,10 +189,14 @@ ggsave(path = "plots",filename = "pam_overall_line.png", width = 10, height = 7)
 ```
 
 Plotting a timeseries of all morning photosynthetic efficiency measurements (5 timepoints)
-```{r}
+```{r, message = F, warning = F}
 #Selecting all morning PAM measurements
 pam_morning <- pam_summary%>%
-  filter(Date == "2021-11-01 06:00:00"| Date == "2021-11-06 06:00:00"| Date == "2021-11-08 06:00:00" |Date == "2021-11-09 06:00:00"| Date =="2021-11-13 06:00:00")
+  filter(Date == "2021-11-01 06:00:00"| 
+         Date == "2021-11-06 06:00:00"| 
+         Date == "2021-11-08 06:00:00"|
+         Date == "2021-11-09 06:00:00"| 
+         Date =="2021-11-13 06:00:00")
 
 #Plotting measurements as a timeseries with standard error bars. 
 ggplot(data = pam_morning,
@@ -170,18 +213,14 @@ ggplot(data = pam_morning,
              size = 1)+
   geom_point(size=3) +
   geom_line(lwd = 2) +
- scale_x_datetime(breaks=date_breaks("3 days"),labels=date_format("%b-%d"))+
+  scale_x_datetime(breaks=date_breaks("3 days"),labels=date_format("%b-%d"))+
   geom_errorbar(aes(ymin = mean_FvFm - se_FvFm, 
                     ymax = mean_FvFm + se_FvFm), 
                     width=30000)+
   labs(x="Date", 
        y = "Photosynthetic efficiency (Fv/Fm)") +
-  scale_fill_manual(values =c('#89226AFF',
-                              '#56B4E9FF', 
-                              '#E65154FF')) +
-  scale_colour_manual(values = c('#89226AFF',
-                                 '#56B4E9FF',
-                                 '#E65154FF'))+
+  scale_fill_manual(values =c('#89226AFF','#56B4E9FF','#E65154FF')) +
+  scale_colour_manual(values = c('#89226AFF','#56B4E9FF','#E65154FF'))+
   theme(axis.text=element_text(size=15),
         axis.title=element_text(size=20), 
         legend.text=element_text(size=15), 
@@ -192,13 +231,13 @@ ggsave(path = "plots",filename = "pam_timeseries.jpg", width = 15, height = 7)
 
 
 Plot comparing morning and afternoon photosynthetic efficiency measurements on first and third days of heatwave:
-```{R}
+```{r, message = F, warning = F}
 #Selecting only PAM measurements taken on first and third heatwave days (Nov. 6 and Nov. 8)
 pam_heatwave<-pam_clean%>%
-  filter(Date == "2021-11-06 06:00:00" | 
-        Date == "2021-11-06 16:00:00" | 
-        Date == "2021-11-08 06:00:00" | 
-        Date == "2021-11-08 16:00:00") %>%
+  filter(Date == "2021-11-06 06:00:00"| 
+        Date == "2021-11-06 16:00:00"| 
+        Date == "2021-11-08 06:00:00"| 
+        Date == "2021-11-08 16:00:00")%>%
   separate(Date, c('Day', 'Hour'), sep = " ", remove = T)%>%
  mutate(Day = fct_relevel(Day, "2021-11-06", "2021-11-08"))
 
@@ -206,16 +245,18 @@ pam_heatwave<-pam_clean%>%
   levels(pam_heatwave$Day) <- c("Heatwave day 1", "Heatwave day 3")
 
 #Plotting data as two boxplots, separated by day. Each boxplot is separated by time (before/after heatwave) and treatment.
-ggplot(pam_heatwave, aes(fill=Treatment, y=Fv_Fm_av, x=Time)) + 
+ggplot(pam_heatwave, 
+       aes(fill=Treatment, 
+           y=Fv_Fm_av, 
+           x=Time)) + 
   geom_boxplot() +
- scale_fill_manual(values =c('#89226AFF',
-                              '#56B4E9FF', 
-                              '#E65154FF')) +
-   labs(x = "Measurement time", y = "Photosynthetic efficiency (Fv/Fm)")+
+ scale_fill_manual(values =c('#89226AFF','#56B4E9FF','#E65154FF')) +
+   labs(x = "Measurement time", 
+        y = "Photosynthetic efficiency (Fv/Fm)")+
   facet_grid(.~Day) +
   theme_classic() +
   theme(strip.text.x = element_text(size = 15),
-       axis.text=element_text(size=15),
+        axis.text=element_text(size=15),
         axis.title=element_text(size=20), 
         legend.text=element_text(size=15), 
         legend.title=element_text(size=20))
@@ -228,25 +269,32 @@ ggsave(path = "plots",filename = "pam_heatwave_boxplot.png", width = 15, height 
 ### Model 1: includes all morning measurement times
 
 Testing assumptions of ANOVA:
-```{r}
+```{r, message = F, warning = F}
 #Filtering data to only include morning measurements
 pam_morning_timeseries <- pam_clean %>% 
   filter(Date == "2021-11-01 06:00:00"| 
-          Date == "2021-11-06 06:00:00"| 
-          Date == "2021-11-08 06:00:00"|
-          Date == "2021-11-09 06:00:00"| 
-          Date =="2021-11-13 06:00:00") %>%
-  mutate(Date = fct_relevel(as.factor(Date),"2021-11-01 06:00:00","2021-11-06 06:00:00","2021-11-08 06:00:00","2021-11-09 06:00:00","2021-11-13 06:00:00"))
-  #arrange_all()
+         Date == "2021-11-06 06:00:00"| 
+         Date == "2021-11-08 06:00:00"|
+         Date == "2021-11-09 06:00:00"| 
+         Date =="2021-11-13 06:00:00") %>%
+  mutate(Date = fct_relevel(as.factor(Date),
+                            "2021-11-01 06:00:00",
+                            "2021-11-06 06:00:00",
+                            "2021-11-08 06:00:00",
+                            "2021-11-09 06:00:00",
+                            "2021-11-13 06:00:00"))
 
 #Testing for normality and equal variances
 shapiro_test(pam_morning_timeseries$Fv_Fm_av)
-bartlett.test(Fv_Fm_av ~ Treatment, data = pam_morning_timeseries)
+bartlett.test(Fv_Fm_av ~ Treatment, 
+              data = pam_morning_timeseries)
 #Results: Data is non-normal and does not have equal variances
 
 #Testing transformations (log, arcsin, and square root)
 pam_morning_timeseries <- pam_morning_timeseries %>%
-  mutate(log_Fv_Fm = log(Fv_Fm_av), sqrt_Fv_Fm = sqrt(Fv_Fm_av), arc_Fv_Fm = asin(sqrt(Fv_Fm_av)))
+  mutate(log_Fv_Fm = log(Fv_Fm_av), 
+         sqrt_Fv_Fm = sqrt(Fv_Fm_av), 
+         arc_Fv_Fm = asin(sqrt(Fv_Fm_av)))
 
 #Testing assumptions of transformed data
 shapiro_test(pam_morning_timeseries$log_Fv_Fm)
@@ -256,45 +304,65 @@ shapiro_test(pam_morning_timeseries$arc_Fv_Fm)
 ```
 
 Since the data does not fit the assumptions of an ANOVA, we will use a gamlss model:
-```{R}
+```{r, echo=FALSE, message = F, warning = F}
 #Finding distribution that best fits data
-fitDist(Fv_Fm_av, data = pam_morning_timeseries, type = "realAll", try.gamlss = T)
+fitDist(Fv_Fm_av, data = pam_morning_timeseries, 
+        type = "realAll", try.gamlss = T)
 #Results: Gumbel is the best fit
 
 #Visualizing distribution
-histDist(pam_morning_timeseries$Fv_Fm_av, "GU", density = F, main = "Gumbel")
+histDist(pam_morning_timeseries$Fv_Fm_av, 
+         "GU", 
+         density = F, 
+         main = "Gumbel")
 
 #Full model
-pam_morning_mod_full <- gamlss(Fv_Fm_av ~ Treatment + Date + Treatment*Date + random(Anemone_ID) + random(Site) + random(Bin), data = pam_morning_timeseries, family = GU(), control = gamlss.control(n.cyc=200))
+pam_morning_mod_full <- gamlss(Fv_Fm_av ~ Treatment + Date + Treatment*Date + random(Anemone_ID) + random(Site) + random(Bin), 
+                               data = pam_morning_timeseries, 
+                               family = GU(), 
+                               control = gamlss.control(n.cyc=200))
+
 
 #Backwards model selection to find best model:
-pam_morning_mod_step <- stepGAIC(pam_morning_mod_full, direction = "backward", trace = F)
+pam_morning_mod_step <- stepGAIC(pam_morning_mod_full, 
+                                 direction = "backward", 
+                                 trace = F)
 formula(pam_morning_mod_step)
 summary(pam_morning_mod_step)
 #Final model includes Treatment, Date, Treatment * Date, and random(Anemone_ID)
 
+#Testing fit of full and reduced models using AIC
+AIC(pam_morning_mod_full, 
+    pam_morning_mod_step)
 ```
 
 ### Model 2: includes morning/afternoon measurements on first and third days of heatwave
 
 Testing assumptions of ANOVA:
-```{r}
+```{r message=FALSE, warning=FALSE}
 #Filtering data to only include morning measurements
 pam_heatwave_timeseries <- pam_clean %>% 
   filter(Date == "2021-11-06 06:00:00"| 
-          Date == "2021-11-06 16:00:00"| 
-          Date == "2021-11-08 06:00:00"|
-          Date =="2021-11-08 16:00:00") %>%
-  mutate(Date = fct_relevel(as.factor(Date),"2021-11-06 06:00:00","2021-11-06 16:00:00","2021-11-08 06:00:00","2021-11-08 16:00:00"))
+         Date == "2021-11-06 16:00:00"| 
+         Date == "2021-11-08 06:00:00"|
+         Date =="2021-11-08 16:00:00") %>%
+  mutate(Date = fct_relevel(as.factor(Date),
+                            "2021-11-06 06:00:00",
+                            "2021-11-06 16:00:00",
+                            "2021-11-08 06:00:00",
+                            "2021-11-08 16:00:00"))
 
 #Testing for normality and equal variances
 shapiro_test(pam_heatwave_timeseries$Fv_Fm_av)
-bartlett.test(Fv_Fm_av ~ Treatment, data = pam_heatwave_timeseries)
+bartlett.test(Fv_Fm_av ~ Treatment,
+              data = pam_heatwave_timeseries)
 #Results: Data is non-normal and does not have equal variances
 
 #Testing transformations (log, arcsin, and square root)
 pam_heatwave_timeseries <- pam_heatwave_timeseries %>%
-  mutate(log_Fv_Fm = log(Fv_Fm_av), sqrt_Fv_Fm = sqrt(Fv_Fm_av), arc_Fv_Fm = asin(sqrt(Fv_Fm_av)))
+  mutate(log_Fv_Fm = log(Fv_Fm_av), 
+         sqrt_Fv_Fm = sqrt(Fv_Fm_av), 
+         arc_Fv_Fm = asin(sqrt(Fv_Fm_av)))
 
 #Testing assumptions of transformed data
 shapiro_test(pam_heatwave_timeseries$log_Fv_Fm)
@@ -303,22 +371,34 @@ shapiro_test(pam_heatwave_timeseries$arc_Fv_Fm)
 #Results: None of the transformations are normal. We will use a gamlss model rather than an ANOVA
 ```
 Since the data does not fit the assumptions of an ANOVA, we will use a gamlss model:
-```{r}
+```{r, echo=FALSE, message = F, warning = F}
 #Finding distribution that fits data
-fitDist(Fv_Fm_av, data = pam_heatwave_timeseries, type = "realAll", try.gamlss = T)
+fitDist(Fv_Fm_av, data = pam_heatwave_timeseries, 
+        type = "realAll", 
+        try.gamlss = T)
 #Best fit: generalized Gamma Loptatsidis-Green
 
 #Visualizing distribution:
-histDist(pam_heatwave_timeseries$Fv_Fm_av, "GG", density = F, main = "generalised Gamma Lopatatsidis-Green")
+histDist(pam_heatwave_timeseries$Fv_Fm_av, 
+         "GG", 
+         density = F, 
+         main = "generalised Gamma Lopatatsidis-Green")
 
 #Full gamlss model
-pam_heatwave_mod_full <- gamlss(Fv_Fm_av ~ Treatment + Date + Treatment*Date + random(as.factor(Bin)) + random(as.factor(Site)), data = pam_heatwave_timeseries, family = GG(), control = gamlss.control(n.cyc=200))
+pam_heatwave_mod_full <- gamlss(Fv_Fm_av ~ Treatment + Date + Treatment*Date + random(as.factor(Bin)) + random(as.factor(Site)), 
+                                data = pam_heatwave_timeseries, 
+                                family = GG(), 
+                                control = gamlss.control(n.cyc=200))
 
 #Backwards model selection to find best model:
 pam_heatwave_mod_final <- stepGAIC(pam_heatwave_mod_full, direction = "backward")
 formula(pam_heatwave_mod_final)
 summary(pam_heatwave_mod_final)
 #Final model includes Treatment, Date, Treatment * Date, random(Bin), and random(Site)
+
+#Testing fit of full and reduced models using AIC
+AIC(pam_heatwave_mod_full, 
+    pam_heatwave_mod_final)
 ```
 
 # Base measurement analysis
@@ -326,14 +406,16 @@ summary(pam_heatwave_mod_final)
 ## Plots
 
 Boxplot of base measurements for each treatment and measurement time:
-```{r}
-ggplot(base_clean, aes(fill = Treatment, x=Event, y = Average_Diameter)) + 
+```{r, message = F, warning = F}
+ggplot(base_clean, 
+       aes(fill = Treatment, 
+           x=Event,
+           y= Average_Diameter)) + 
         theme_classic() +
          geom_boxplot() +
-labs(x = "Measurement time", y = "Base diameter (mm)") +
-  scale_fill_manual(values =c('#89226AFF',
-                              '#56B4E9FF', 
-                              '#E65154FF')) +
+labs(x = "Measurement time", 
+     y = "Base diameter (mm)") +
+  scale_fill_manual(values =c('#89226AFF','#56B4E9FF','#E65154FF')) +
   theme(axis.text=element_text(size=15),
         axis.title=element_text(size=20), 
         legend.text=element_text(size=15), 
@@ -344,9 +426,10 @@ ggsave(path = "plots",filename = "base_boxplot.png", width = 10, height = 7)
 ## Analyzing base diameter data
 
 Testing assumptions for ANOVA:
-```{r}
+```{r, message = F, warning = F}
 shapiro_test(base_clean$Average_Diameter)
-bartlett.test(Average_Diameter ~ Treatment, data = base_clean)
+bartlett.test(Average_Diameter ~ Treatment, 
+              data = base_clean)
 #Data is non-normal and does not have equal variances
 
 #Trying log transformation:
@@ -355,19 +438,27 @@ base_clean <- base_clean %>%
 
 #Testing assumptions for log transformed data:
 shapiro_test(base_clean$log_diameter)
-bartlett.test(log_diameter ~ Treatment, data = base_clean)
+bartlett.test(log_diameter ~ Treatment, 
+              data = base_clean)
 base_clean %>%
   group_by(Date, Treatment) %>%
   identify_outliers(log_diameter)
-#Results: Log transformed data is normal and has equal variances. The data has one extreme outlier, but this will not have a major effect on the results. We will use an two-way ANOVA on the log transformed data.
+#Results: Log transformed data is normal and has equal variances. The data has one extreme 
+#outlier, but this will not have a major effect on the results. We will use an two-way ANOVA 
+#on the log transformed data.
 ```
 
 Performing two-way ANOVA test:
-```{r}
-#Two-way ANOVA on base diameter data with treatment and date as fixed effects, and anemone ID as a random effect:
-base_aov <- aov(log_diameter ~ Treatment*Date + random(Anemone_ID), data=base_clean)
+```{r, message = F, warning = F}
+#Two-way ANOVA on base diameter data with treatment and date as fixed effects, and 
+#anemone ID as a random effect:
+base_aov <- aov(log_diameter ~ Treatment*Date + random(Anemone_ID), 
+                data=base_clean)
 summary(base_aov)
 TukeyHSD(base_aov)
+
+#Testing fit of full and reduced models using AIC
+AIC(base_aov)
 ```
 
 # Feeding time
@@ -375,14 +466,16 @@ TukeyHSD(base_aov)
 ## Plots
 
 Boxplot of feeding time data for each treatment and measurement time:
-```{r}
-ggplot(food_clean, aes(fill = Treatment, x=Event, y = Feeding_Time_Min)) + 
-        theme_classic() +
-         geom_boxplot() +
-  labs(x = "Measurement time", y = "Feeding time (min)") +
-  scale_fill_manual(values =c('#89226AFF',
-                              '#56B4E9FF', 
-                              '#E65154FF')) +
+```{r, message = F, warning = F}
+ggplot(food_clean, 
+       aes(fill = Treatment, 
+           x=Event, 
+           y = Feeding_Time_Min)) + 
+  theme_classic() +
+  geom_boxplot() +
+  labs(x = "Measurement time", 
+       y = "Feeding time (min)") +
+  scale_fill_manual(values =c('#89226AFF','#56B4E9FF','#E65154FF')) +
   theme(axis.text=element_text(size=15),
         axis.title=element_text(size=20), 
         legend.text=element_text(size=15), 
@@ -392,9 +485,10 @@ ggsave(path = "plots",filename = "food_boxplot.png", width = 10, height = 7)
 
 ## Analyzing feeding time data
 
-```{r}
+```{r, message = F, warning = F}
 shapiro.test(food_clean$Feeding_Time_Min)
-bartlett.test(Feeding_Time_Min ~ Treatment, data = food_clean)
+bartlett.test(Feeding_Time_Min ~ Treatment, 
+              data = food_clean)
 #Data is non-normal and does not have equal variances
 
 #Trying log transformation:
@@ -402,19 +496,25 @@ food_clean<-food_clean%>%
   mutate(log_Feeding_Time_Min = log(Feeding_Time_Min))
 
 shapiro_test(food_clean$log_Feeding_Time_Min)
-bartlett.test(log_Feeding_Time_Min ~ Treatment, data = food_clean)
+bartlett.test(log_Feeding_Time_Min ~ Treatment, 
+              data = food_clean)
 food_clean %>%
   group_by(Date, Treatment) %>%
   identify_outliers(log_Feeding_Time_Min)
-#Log transformed data fits normal distribution and has equal variances. There are also no extreme outliers. We will use a two-way ANOVA to analyze the log-transformed data.
+#Log transformed data fits normal distribution and has equal variances. There are also no extreme outliers. 
+#We will use a two-way ANOVA to analyze the log-transformed data.
 ```
 
 Performing two-way ANOVA on log transformed feeding time data:
-```{r}
+```{r, message = F, warning = F}
 #Two-way anova with treatment and date as fixed effects, and anemone ID as a random effect
-food_aov <- aov(log_Feeding_Time_Min ~ Treatment*Date + random(Anemone_ID), data=food_clean)
+food_aov <- aov(log_Feeding_Time_Min ~ Treatment*Date + random(Anemone_ID), 
+                data=food_clean)
 summary(food_aov)
 TukeyHSD(food_aov)
+
+#Testing fit of full and reduced models using AIC
+AIC(food_aov)
 ```
 
 # Heatwave response data analysis
@@ -422,18 +522,22 @@ TukeyHSD(food_aov)
 ## Plots
 
 Creating a stacked bar plot showing proportions of open, closed, and partially open anemones at each hour of the heatwave on each day
-```{r}
-ggplot(data = open_closed_summary, aes(x = Time_Block, y = n, fill = Open_Closed)) + 
-  geom_bar(position = "fill", stat = "identity") + 
+```{r, message = F, warning = F}
+ggplot(data = open_closed_summary, 
+       aes(x = Time_Block, 
+           y = n, 
+           fill = Open_Closed)) + 
+  geom_bar(position = "fill", 
+           stat = "identity") + 
   facet_grid(Event ~ Treatment) +
-  labs(x="Time (hours)", y = "Proportion", fill = "Behaviour") +
+  labs(x="Time (hours)", 
+       y = "Proportion", 
+       fill = "Behaviour") +
   theme_classic()+
-scale_fill_manual(values = c('#FFE082',
-                              '#2C728EFF',    
-                              '#E65154FF'))+
+scale_fill_manual(values = c('#FFE082','#2C728EFF','#E65154FF'))+
   theme(strip.text.x = element_text(size = 15),
         strip.text.y = element_text(size= 15),
-       axis.text=element_text(size=15),
+        axis.text=element_text(size=15),
         axis.title=element_text(size=20), 
         legend.text=element_text(size=15), 
         legend.title=element_text(size=20))
@@ -442,44 +546,51 @@ ggsave(path = "plots",filename = "open_closed_plot.png", width = 10, height = 7)
 
 ## Analyzing data
 Exploratory data analysis:
-```{r}
+```{r, message = F, warning = F}
 #Summarizing the data
 summary(open_closed_summary)
 #Making frequency table
-table(open_closed_clean$Treatment, open_closed_clean$Open_Closed)
+table(open_closed_clean$Treatment, 
+      open_closed_clean$Open_Closed)
 
 ```
 
 
 Ordinal regression model (unsuccessful)
-```{r}
-ord_model = clmm(Open_Closed ~ Treatment:Time_Block:Date + (1|Anemone_ID), data = open_closed_clean)
+```{r, echo = F message = F, warning = F}
+ord_model = clmm(Open_Closed ~ Treatment:Time_Block:Date + (1|Anemone_ID), 
+                 data = open_closed_clean)
 summary(ord_model)
-#This technique did not accurately model our data due to the low frequencies of measurements in some categories:
+#This technique did not accurately model our data due to the low frequencies of measurements 
+#in some categories
 ```
 
 Bayesian regression analysis
-```{r}
-#Running a Bayesian model with weakly flat priors. Fixed effects are treatment, time block, and date. Anemone ID is a random effect.
+```{r, message = F, warning = F}
+#Running a Bayesian model with weakly flat priors. 
+#Fixed effects are treatment, time block, and date. 
+#Anemone ID is a random effect.
 
 #Run this code once before running model
 #options(mc.cores=parallel::detectCores())
 
-bay_mod <- brm(Open_Closed ~ Treatment + Time_Block + Date + (1|Anemone_ID), data = open_closed_clean, family = cumulative("logit"))
-summary(bay_mod)
+#bay_mod <- brm(Open_Closed ~ Treatment + Time_Block + Date + (1|Anemone_ID), 
+               #data = open_closed_clean, 
+               #family = cumulative("logit"))
+#summary(bay_mod)
 
 #Calculating percent confidence for each treatment, date, and time block
-response_post = posterior_samples(bay_mod)
-sum(response_post$b_Treatment30C > 0) / 4000 # 0.82275
-sum(response_post$b_Treatment25C > 0) / 4000 # 0.2765
-sum(response_post$b_Time_Block1 > 0) / 4000 # 0.888
-sum(response_post$b_Time_Block2 > 0) / 4000 #0.9975
-sum(response_post$b_Time_Block3 > 0) / 4000 # 0.88
-sum(response_post$b_Time_Block4 > 0) / 4000 # 0.99875
-sum(response_post$b_Time_Block5 > 0) / 4000 # 1
-sum(response_post$b_Time_Block6 > 0) / 4000 # 1
-sum(response_post$b_Date11D7D2021 > 0) / 4000 # 0.17525
-sum(response_post$b_Date11D8D2021 > 0) / 4000 # 0.42775
+#response_post = posterior_samples(bay_mod)
+#sum(response_post$b_Treatment30C > 0) / 4000 # 0.82275
+#sum(response_post$b_Treatment25C > 0) / 4000 # 0.2765
+#sum(response_post$b_Time_Block1 > 0) / 4000 # 0.888
+#sum(response_post$b_Time_Block2 > 0) / 4000 #0.9975
+#sum(response_post$b_Time_Block3 > 0) / 4000 # 0.88
+#sum(response_post$b_Time_Block4 > 0) / 4000 # 0.99875
+#sum(response_post$b_Time_Block5 > 0) / 4000 # 1
+#sum(response_post$b_Time_Block6 > 0) / 4000 # 1
+#sum(response_post$b_Date11D7D2021 > 0) / 4000 # 0.17525
+#sum(response_post$b_Date11D8D2021 > 0) / 4000 # 0.42775
 ```
 
 # Hemocytometer data analysis
@@ -487,7 +598,7 @@ sum(response_post$b_Date11D8D2021 > 0) / 4000 # 0.42775
 ## Plots
 
 Boxplots of dinoflagellate density and mitotic index at each measurement time:
-```{r}
+```{r, message = F, warning = F}
 #Dinoflagellate density
 p1 <- ggplot(data = hemo_summary, 
        aes(x= Date, 
@@ -497,7 +608,7 @@ p1 <- ggplot(data = hemo_summary,
   theme_classic() +
   geom_errorbar(aes(ymin = mean_Dino_Density - se_Dino_Density, 
                     ymax = mean_Dino_Density + se_Dino_Density), 
-                   width=30000) +
+                    width=30000) +
   geom_vline(xintercept = as.POSIXct("2021-11-06 09:00:00"),
              linetype = "dotted", 
              size = 1) +
@@ -506,16 +617,13 @@ p1 <- ggplot(data = hemo_summary,
              size = 1)+
   geom_point(size=3) +
   geom_line(lwd = 2) +
-  scale_fill_manual(values =c('#89226AFF',
-   '#56B4E9FF',                            '#E65154FF')) +
-  scale_colour_manual(values = c('#89226AFF',
-                                 '#56B4E9FF',
-                                 '#E65154FF'))+
+  scale_fill_manual(values =c('#89226AFF','#56B4E9FF','#E65154FF')) +
+  scale_colour_manual(values = c('#89226AFF','#56B4E9FF','#E65154FF'))+
   labs(x="Date", 
        y = "Zooxanthellae density (cells/mg)")+
-   scale_x_datetime(breaks=date_breaks("3 days"),labels=date_format("%b-%d")) +
+  scale_x_datetime(breaks=date_breaks("3 days"),
+                    labels=date_format("%b-%d")) +
   theme(legend.position = "none")
-
 
 #Mitotic Index of Dinoflagellates
 p2 = ggplot(data = hemo_summary, 
@@ -526,7 +634,7 @@ p2 = ggplot(data = hemo_summary,
   theme_classic() +
   geom_errorbar(aes(ymin = mean_Dino_MI - se_Dino_MI, 
                     ymax = mean_Dino_MI + se_Dino_MI), 
-                   width=30000) +
+                    width=30000) +
   geom_point(size=3) +
   geom_line(lwd = 2) +
   geom_vline(xintercept = as.POSIXct("2021-11-06 09:00:00"),
@@ -535,15 +643,12 @@ p2 = ggplot(data = hemo_summary,
   geom_vline(xintercept = as.POSIXct("2021-11-08 16:00:00"), 
              linetype = "dotted", 
              size = 1)+
-   scale_fill_manual(values = c('#89226AFF',
-                              '#56B4E9FF',    
-                              '#E65154FF')) +
-  scale_colour_manual(values = c('#89226AFF',
-                                 '#56B4E9FF',
-                                 '#E65154FF'))+
+   scale_fill_manual(values = c('#89226AFF','#56B4E9FF','#E65154FF')) +
+  scale_colour_manual(values = c('#89226AFF','#56B4E9FF','#E65154FF'))+
   labs(x="Date", 
        y = "Zooxanthellae Mitotic Index")+
-   scale_x_datetime(breaks=date_breaks("3 days"),labels=date_format("%b-%d")) 
+   scale_x_datetime(breaks=date_breaks("3 days"),
+                    labels=date_format("%b-%d")) 
 
 #Combining plots
 p1 + p2
@@ -554,10 +659,11 @@ ggsave(path = "plots",filename = "dinoflagellate_density_MI.png", width = 10, he
 ## Analyzing zooxanthellae density and mitotic index
 
 ### Zooxanthellae density
-```{r}
+```{r, message = F, warning = F}
 #Dinoflagellate density
 shapiro_test(hemo_clean$Dino_Density)
-bartlett.test(Dino_Density ~ Treatment, data = hemo_clean)
+bartlett.test(Dino_Density ~ Treatment, 
+              data = hemo_clean)
 #Data has equal variances but is not normal
 
 #log transformation:
@@ -565,18 +671,25 @@ hemo_clean <- hemo_clean %>%
   mutate(log_Dino_Density = log(Dino_Density))
 
 shapiro_test(hemo_clean$log_Dino_Density)
-bartlett.test(log_Dino_Density ~ Treatment, data = hemo_clean)
+bartlett.test(log_Dino_Density ~ Treatment, 
+              data = hemo_clean)
 hemo_clean %>%
   group_by(Treatment, Date) %>%
-  identify_outliers(log_Dino_Density) #Extreme outliers: A4F at 10-31 and A60B at 11-13
-#Log transformed data is normal and has equal variances. There are two extreme outliers but this will not have a major impact on the results. We will use a two-way ANOVA to analyze this data.
+  identify_outliers(log_Dino_Density) 
+#Log transformed data is normal and has equal variances. 
+#There are two extreme outliers but this will not have a major impact on the results. 
+#We will use a two-way ANOVA to analyze this data.
 ```
 
 Two-way AVOVA on zooxanthellae density data:
-```{r}
-Dino_Density_aov <- aov(log_Dino_Density ~ Treatment*as.factor(Date) + random(Anemone_ID), data=hemo_clean)
+```{r, message = F, warning = F}
+Dino_Density_aov <- aov(log_Dino_Density ~ Treatment*as.factor(Date) + random(Anemone_ID),
+                        data=hemo_clean)
 summary(Dino_Density_aov)
 TukeyHSD(Dino_Density_aov)
+
+#Testing fit of full and reduced models using AIC
+AIC(Dino_Density_aov)
 ```
 
 
@@ -584,12 +697,15 @@ TukeyHSD(Dino_Density_aov)
 ```{r}
 #Dinoflagellate mitotic index
 shapiro_test(hemo_clean$Dino_MI)
-bartlett.test(Dino_MI ~ Treatment, data = hemo_clean)
+bartlett.test(Dino_MI ~ Treatment, 
+              data = hemo_clean)
 #Data has equal variances but is not normal
 
 # Trying transformations:
 hemo_clean <- hemo_clean %>%
-  mutate(log_Dino_MI = log(Dino_MI + 0.1), arcsine_Dino_MI = asin(sqrt(Dino_MI)), sqrt_Dino_MI = sqrt(Dino_MI))
+  mutate(log_Dino_MI = log(Dino_MI + 0.1), 
+         arcsine_Dino_MI = asin(sqrt(Dino_MI)), 
+         sqrt_Dino_MI = sqrt(Dino_MI))
 
 # Testing normality of transformed data
 shapiro_test(hemo_clean$log_Dino_MI) 
@@ -597,28 +713,35 @@ shapiro_test(hemo_clean$arcsine_Dino_MI)
 shapiro_test(hemo_clean$sqrt_Dino_MI) 
 #Arcsin and square root tranformations are not normal, but the log transformed data is.
 
-bartlett.test(log_Dino_MI ~ Treatment, data = hemo_clean) #0.03211
+bartlett.test(log_Dino_MI ~ Treatment, 
+              data = hemo_clean) #0.03211
 #log transformed data has equal variances
 
 hemo_clean %>%
   group_by(Treatment, Date) %>%
   identify_outliers(log_Dino_MI) 
-#The data has three extreme outliers, but this will not have a major effect on the results. We will use an two-way ANOVA on the log transformed data.
-
-ungroup(hemo_clean)
+#The data has three extreme outliers, but this will not have a major effect on the results. 
+#We will use an two-way ANOVA on the log transformed data.
 ```
+
 Two-way ANOVA on mitotic index data:
-```{r}
+```{r, message = F, warning = F}
 #Dinoflagellate mitotic index
-Dino_MI_aov <- aov(log_Dino_MI ~ Treatment*as.factor(Date) + random(Anemone_ID), data=hemo_clean)
+Dino_MI_aov <- aov(log_Dino_MI ~ Treatment*as.factor(Date) + random(Anemone_ID), 
+                   data=hemo_clean)
 summary(Dino_MI_aov)
 TukeyHSD(Dino_MI_aov)
+
+#Testing fit of full and reduced models using AIC
+AIC(Dino_MI_aov)
 ```
 
-# Heatwave temperature plot
+# Heatwave temperature
+
+##Plots
 
 Creating a plot to show the average temperature in the final 3 hours of the heatwave (after the temperature ramp) on each day
-```{r}
+```{r, message = F, warning = F}
 ggplot(data = temp_summary,
        aes(x=Time_Block, 
            y = mean_temp,
@@ -627,21 +750,16 @@ ggplot(data = temp_summary,
   theme_classic() +
   geom_point(size=2.5) +
   geom_line(lwd = 1.5) +
-   facet_grid(Event ~ .) +
-  scale_fill_manual(values = c('#89226AFF',
-                              '#56B4E9FF',    
-                              '#E65154FF')) +
-  scale_colour_manual(values = c('#89226AFF',
-                                 '#56B4E9FF',
-                                 '#E65154FF'))+
+   facet_grid(. ~ Event) +
+  scale_fill_manual(values = c('#89226AFF','#56B4E9FF','#E65154FF')) +
+  scale_colour_manual(values = c('#89226AFF','#56B4E9FF','#E65154FF'))+
   labs(x="Time (Hours)", 
-       y = "Temperature (°C)") +
+       y ="Temperature (°C)") +
   theme(strip.text.y = element_text(size = 15),
        axis.text=element_text(size=15),
-        axis.title=element_text(size=20), 
-        legend.text=element_text(size=15), 
-        legend.title=element_text(size=20))
+       axis.title=element_text(size=20), 
+       legend.text=element_text(size=15), 
+       legend.title=element_text(size=20))
   
 ggsave(path = "plots",filename = "temp_plot.png", width = 10, height = 7)
 ```
-
