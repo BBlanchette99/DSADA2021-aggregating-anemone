@@ -1,4 +1,4 @@
-# aggregating-anemone-data
+# DSADA2021-aggregating-anemone
 
 Authors:
 
