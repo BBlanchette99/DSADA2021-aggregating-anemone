@@ -8,11 +8,11 @@ output:
 ---
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-knitr::opts_chunk$set(tidy.opts=list(width.cutoff=80), tidy=TRUE)
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60), tidy=TRUE)
 ```
 
-## Loading libraries and data
-```{r, message = F, warning = F}
+# Loading libraries and data
+```{r, cache = TRUE, message = F, warning = F}
 #loading libraries
 library(rstatix)
 library(fitdistrplus) 
@@ -29,11 +29,11 @@ pam<-read_delim("data/pam_data_clean.csv", delim = ",")
 base <- read_delim("data/base_diameter_data_clean.csv", delim = ",")
 food <- read_delim("data/feeding_time_data_clean.csv", delim = ",")
 open_closed <- read_delim("data/open_closed_data_clean.csv", delim = ",")
-hemocytometer <- read_delim("data/hemocytometer_data_clean.csv", delim = ",")
+hemocytometer <- read_delim("data/hemocytometer_data_clean.csv", delim = ",")  
 ```
 
 # Cleaning data
-```{r, message = F, warning = F}
+```{r, cache = TRUE, message = F, warning = F}
 #Creating a clean dataframe for each response variable, and a summarized dataframe with average #value for each treatment at each measurement time
 
 #Function to calculate standard error for data summaries
@@ -42,20 +42,23 @@ standard_error <- function(x) sd(x) / sqrt(length(x))
 #Cleaning photosynthetic efficiency data: Filtering to remove measurements that were not used 
 #during analysis, formatting columns, and selecting columns needed for model.
 pam_clean <- pam %>%
-  filter(Measurement != "NA")%>% 
-  select(Date,Event,Measurement,Treatment,Bin,Site,Anemone_ID,Fv_Fm_av)%>%
-  mutate(Date = as.POSIXct(as.character(Date),
-                           format="%m/%d/%Y %H:%M:%S"),
-         Anemone_ID = as.factor(Anemone_ID), 
-         Bin = as.factor(Bin), 
-         Measurement = as.factor(Measurement), 
-         Site = as.factor(Site), 
-         Event = factor(Event, levels = c("Acclimation","Pre-heat", "Post-heat", "Recovery")),
-         Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"))
+  filter(Date != "10/25/2021 6:00:00", 
+         Date != "10/28/2021 6:00:00", 
+         Date != "11/07/2021 6:00:00", 
+         Date != "11/07/2021 16:00:00") %>% 
+  select(Date,Event,Treatment,Bin,Site,Anemone_ID,Fv_Fm_av)%>%
+  mutate(Date =
+           as.POSIXct(as.character(Date),
+                      format="%m/%d/%Y %H:%M:%S"),
+         Anemone_ID = as.factor(Anemone_ID),   
+         Bin = as.factor(Bin),  
+         Site = as.factor(Site),   
+         Event = factor(Event, levels = c("Acclimation","Pre-heat", "Post-heat","After Heatwave","Recovery ")),   
+         Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"))  
 
 #Mean and standard error of photosynthetic efficiency for each treatment and measurement time
 pam_summary <- pam_clean%>%
-  group_by(Date, Measurement, Treatment) %>%
+  group_by(Date,  Treatment) %>%
   summarize(mean_FvFm = mean(Fv_Fm_av), 
             se_FvFm = standard_error(Fv_Fm_av))
 
@@ -64,50 +67,50 @@ pam_summary <- pam_clean%>%
 base_clean<-base%>%
   filter(Treatment != "NA", 
          Average_Diameter != "NA")%>% 
-  mutate(Date = factor(Date, levels =c("31-Oct", "05-Nov", "09-Nov", "13-Nov")), 
-         Event = fct_relevel(as.factor(Event), "Acclimation","Before heatwave", "After heatwave", "Recovery"),
-         Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), 
-         Anemone_ID = as.factor(Anemone_ID), 
-         Bin = as.factor(Bin), 
-         Site = as.factor(Site)) %>%
+  mutate(Date = factor(Date, levels =c("31-Oct", "05-Nov", "09-Nov", "13-Nov")),  
+         Event = fct_relevel(as.factor(Event),   "Acclimation","Before heatwave", "After heatwave", "Recovery"),
+         Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"),   
+         Anemone_ID = as.factor(Anemone_ID),   
+         Bin = as.factor(Bin),   
+         Site = as.factor(Site)) %>%  
 select(Date,Event,Treatment,Bin,Site,Anemone_ID,Average_Diameter)%>%
    arrange_all()
 
 #Mean and standard error of base measurement data for each treatment and measurement time
 base_summary <- base_clean%>%
   group_by(Date, Treatment)%>%
-  summarize(mean_base = mean(Average_Diameter), 
+  summarize(mean_base = mean(Average_Diameter),   
             se_base = standard_error(Average_Diameter))
 
 #Cleaning feeding time data: Filtering to remove measurements that were not used during 
 #analysis, formatting columns, and selecting columns needed for model.
 food_clean <- food%>%
   filter(Date != "10/28/2021")%>%
-  mutate(Feeding_Time_Min = as.numeric(Feeding_Min),
-         Event = fct_relevel(as.factor(Event),"Acclimation", "Before heatwave", "After heatwave", "Recovery"),
-         Date = as.factor(Date),
-         Site = as.factor(Site),
-         Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"), 
-         Anemone_ID = as.factor(Anemone_ID), 
-         Bin = as.factor(Bin))%>%
-select(Date, Event,Treatment, Bin, Site, Anemone_ID, Feeding_Time_Min)
+  mutate(Feeding_Time_Min = as.numeric(Feeding_Time_Min),  
+         Event = fct_relevel(as.factor(Event),"Acclimation", "Before heatwave", "After heatwave", "Recovery"),  
+         Date = as.factor(Date),  
+         Site = as.factor(Site),  
+         Treatment = fct_relevel(as.factor(Treatment), "Control", "25C", "30C"),   
+         Anemone_ID = as.factor(Anemone_ID),   
+         Bin = as.factor(Bin))%>%  
+select(Date, Event,Treatment, Bin, Site, Anemone_ID,   Feeding_Time_Min)  
 
 #Mean and standard error of feeding time data for each treatment and measurement time
 food_summary <- food %>%
   group_by(Date, Treatment) %>%
-  summarize(mean_time = mean(Feeding_Time_Min), 
-            se_time = standard_error(Feeding_Time_Min))
+  summarize(mean_time = mean(Feeding_Time_Min),  
+            se_time = standard_error(Feeding_Time_Min))  
 
 #Cleaning heatwave response data: Formatting columns and selecting columns needed for model.
 open_closed_clean <- open_closed %>%
   mutate(Date = as.factor(Date),
          Anemone_ID = as.factor(Anemone_ID),
-         Time_Block = fct_relevel(as.factor(Time_Block), "0", "1", "2", "3", "4", "5", "6"), 
-         Treatment = as.factor(Treatment),  
-         Open_Closed = as.factor(Open_Closed), 
-         Open_Closed = factor(Open_Closed, levels = c("Open", "Partially open", "Closed"), ordered = TRUE), 
-         Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))%>%
-  select(Date, Event, Time_Block,Bin, Treatment, Open_Closed, Anemone_ID)
+         Time_Block = fct_relevel(as.factor(Time_Block), "0", "1", "2", "3", "4", "5", "6"),   
+         Treatment = as.factor(Treatment),   
+         Open_Closed = as.factor(Open_Closed),  
+         Open_Closed = factor(Open_Closed, levels = c("Open", "Partially open", "Closed"), ordered = TRUE),   
+         Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))%>%  
+  select(Date, Event, Time_Block,Bin, Treatment, Open_Closed, Anemone_ID)  
 
 #Counts of heatwave response data for each treatment and measurement time
 open_closed_summary <- open_closed_clean %>%
@@ -153,11 +156,13 @@ temp_summary <- open_closed %>%
   mutate(Treatment = fct_relevel(Treatment, "Control", "25C", "30C"))
 ```
 
+\newpage
+
 # PAM data analysis
 
 ## Plots
 Plotting a timeseries including all photosynthetic efficiency measurement times
-```{r, message = F, warning = F}
+```{r, cache = TRUE, message = F, warning = F}
 #Plotting measurements as a timeseries with standard error bars. 
 ggplot(data = pam_summary, 
        aes(x=Date, 
@@ -180,16 +185,16 @@ ggplot(data = pam_summary,
        y = "Photosynthetic efficiency (Fv/Fm)") +
   scale_fill_manual(values =c('#89226AFF','#56B4E9FF','#E65154FF')) +
   scale_colour_manual(values = c('#89226AFF','#56B4E9FF','#E65154FF'))+
-  theme(axis.text=element_text(size=15),
-        axis.title=element_text(size=20), 
-        legend.text=element_text(size=15), 
-        legend.title=element_text(size=20))
+  theme(axis.text=element_text(size=10),
+        axis.title=element_text(size=15), 
+        legend.text=element_text(size=10), 
+        legend.title=element_text(size=15))
 
 ggsave(path = "plots",filename = "pam_overall_line.png", width = 10, height = 7)
 ```
 
 Plotting a timeseries of all morning photosynthetic efficiency measurements (5 timepoints)
-```{r, message = F, warning = F}
+```{r, cache = TRUE, message = F, warning = F}
 #Selecting all morning PAM measurements
 pam_morning <- pam_summary%>%
   filter(Date == "2021-11-01 06:00:00"| 
@@ -221,17 +226,17 @@ ggplot(data = pam_morning,
        y = "Photosynthetic efficiency (Fv/Fm)") +
   scale_fill_manual(values =c('#89226AFF','#56B4E9FF','#E65154FF')) +
   scale_colour_manual(values = c('#89226AFF','#56B4E9FF','#E65154FF'))+
-  theme(axis.text=element_text(size=15),
-        axis.title=element_text(size=20), 
-        legend.text=element_text(size=15), 
-        legend.title=element_text(size=20))
+  theme(axis.text=element_text(size=10),
+        axis.title=element_text(size=15), 
+        legend.text=element_text(size=10), 
+        legend.title=element_text(size=15))
 
 ggsave(path = "plots",filename = "pam_timeseries.jpg", width = 15, height = 7)
 ```
 
 
 Plot comparing morning and afternoon photosynthetic efficiency measurements on first and third days of heatwave:
-```{r, message = F, warning = F}
+```{r,cache = TRUE, message = F, warning = F}
 #Selecting only PAM measurements taken on first and third heatwave days (Nov. 6 and Nov. 8)
 pam_heatwave<-pam_clean%>%
   filter(Date == "2021-11-06 06:00:00"| 
@@ -255,21 +260,23 @@ ggplot(pam_heatwave,
         y = "Photosynthetic efficiency (Fv/Fm)")+
   facet_grid(.~Day) +
   theme_classic() +
-  theme(strip.text.x = element_text(size = 15),
-        axis.text=element_text(size=15),
-        axis.title=element_text(size=20), 
-        legend.text=element_text(size=15), 
-        legend.title=element_text(size=20))
+  theme(strip.text.x = element_text(size = 10),
+        axis.text=element_text(size=10),
+        axis.title=element_text(size=15), 
+        legend.text=element_text(size=10), 
+        legend.title=element_text(size=15))
         
 ggsave(path = "plots",filename = "pam_heatwave_boxplot.png", width = 15, height = 7)
 ```
+
+\newpage
 
 ## Analysis of photosynthetic efficiency data
 
 ### Model 1: includes all morning measurement times
 
 Testing assumptions of ANOVA:
-```{r, message = F, warning = F}
+```{r, echo = FALSE, cache = TRUE, message = F, warning = F}
 #Filtering data to only include morning measurements
 pam_morning_timeseries <- pam_clean %>% 
   filter(Date == "2021-11-01 06:00:00"| 
@@ -304,7 +311,7 @@ shapiro_test(pam_morning_timeseries$arc_Fv_Fm)
 ```
 
 Since the data does not fit the assumptions of an ANOVA, we will use a gamlss model:
-```{r, echo=FALSE, message = F, warning = F}
+```{r, cache = TRUE, message = F, warning = F}
 #Finding distribution that best fits data
 fitDist(Fv_Fm_av, data = pam_morning_timeseries, 
         type = "realAll", try.gamlss = T)
@@ -315,7 +322,9 @@ histDist(pam_morning_timeseries$Fv_Fm_av,
          "GU", 
          density = F, 
          main = "Gumbel")
+```
 
+```{r, echo=FALSE, cache = TRUE, results = F, message = F, warning = F}
 #Full model
 pam_morning_mod_full <- gamlss(Fv_Fm_av ~ Treatment + Date + Treatment*Date + random(Anemone_ID) + random(Site) + random(Bin), 
                                data = pam_morning_timeseries, 
@@ -327,19 +336,23 @@ pam_morning_mod_full <- gamlss(Fv_Fm_av ~ Treatment + Date + Treatment*Date + ra
 pam_morning_mod_step <- stepGAIC(pam_morning_mod_full, 
                                  direction = "backward", 
                                  trace = F)
-formula(pam_morning_mod_step)
-summary(pam_morning_mod_step)
-#Final model includes Treatment, Date, Treatment * Date, and random(Anemone_ID)
+```
 
+```{r, cache = TRUE, message = F, warning = F}
 #Testing fit of full and reduced models using AIC
 AIC(pam_morning_mod_full, 
     pam_morning_mod_step)
+formula(pam_morning_mod_step)
+summary(pam_morning_mod_step)
+#Final model includes Treatment, Date, Treatment * Date, and random(Anemone_ID)
 ```
+
+\newpage
 
 ### Model 2: includes morning/afternoon measurements on first and third days of heatwave
 
 Testing assumptions of ANOVA:
-```{r message=FALSE, warning=FALSE}
+```{r,echo = FALSE, cache = TRUE, message=FALSE, warning=FALSE}
 #Filtering data to only include morning measurements
 pam_heatwave_timeseries <- pam_clean %>% 
   filter(Date == "2021-11-06 06:00:00"| 
@@ -371,7 +384,7 @@ shapiro_test(pam_heatwave_timeseries$arc_Fv_Fm)
 #Results: None of the transformations are normal. We will use a gamlss model rather than an ANOVA
 ```
 Since the data does not fit the assumptions of an ANOVA, we will use a gamlss model:
-```{r, echo=FALSE, message = F, warning = F}
+```{r, cache = TRUE, message = F, warning = F}
 #Finding distribution that fits data
 fitDist(Fv_Fm_av, data = pam_heatwave_timeseries, 
         type = "realAll", 
@@ -384,6 +397,9 @@ histDist(pam_heatwave_timeseries$Fv_Fm_av,
          density = F, 
          main = "generalised Gamma Lopatatsidis-Green")
 
+```
+
+```{r, cache = TRUE, echo=FALSE, results = F, message = F, warning = F}
 #Full gamlss model
 pam_heatwave_mod_full <- gamlss(Fv_Fm_av ~ Treatment + Date + Treatment*Date + random(as.factor(Bin)) + random(as.factor(Site)), 
                                 data = pam_heatwave_timeseries, 
@@ -392,6 +408,10 @@ pam_heatwave_mod_full <- gamlss(Fv_Fm_av ~ Treatment + Date + Treatment*Date + r
 
 #Backwards model selection to find best model:
 pam_heatwave_mod_final <- stepGAIC(pam_heatwave_mod_full, direction = "backward")
+```
+
+
+```{r, cache = TRUE, message = F, warning = F}
 formula(pam_heatwave_mod_final)
 summary(pam_heatwave_mod_final)
 #Final model includes Treatment, Date, Treatment * Date, random(Bin), and random(Site)
@@ -401,12 +421,14 @@ AIC(pam_heatwave_mod_full,
     pam_heatwave_mod_final)
 ```
 
+\newpage
+
 # Base measurement analysis
 
 ## Plots
 
 Boxplot of base measurements for each treatment and measurement time:
-```{r, message = F, warning = F}
+```{r, cache = TRUE, message = F, warning = F}
 ggplot(base_clean, 
        aes(fill = Treatment, 
            x=Event,
@@ -416,17 +438,17 @@ ggplot(base_clean,
 labs(x = "Measurement time", 
      y = "Base diameter (mm)") +
   scale_fill_manual(values =c('#89226AFF','#56B4E9FF','#E65154FF')) +
-  theme(axis.text=element_text(size=15),
-        axis.title=element_text(size=20), 
-        legend.text=element_text(size=15), 
-        legend.title=element_text(size=20))
+  theme(axis.text=element_text(size=10),
+        axis.title=element_text(size=15), 
+        legend.text=element_text(size=10), 
+        legend.title=element_text(size=15))
 ggsave(path = "plots",filename = "base_boxplot.png", width = 10, height = 7)
 ```
 
 ## Analyzing base diameter data
 
 Testing assumptions for ANOVA:
-```{r, message = F, warning = F}
+```{r, cache = TRUE, message = F, warning = F}
 shapiro_test(base_clean$Average_Diameter)
 bartlett.test(Average_Diameter ~ Treatment, 
               data = base_clean)
@@ -449,7 +471,7 @@ base_clean %>%
 ```
 
 Performing two-way ANOVA test:
-```{r, message = F, warning = F}
+```{r, cache = TRUE, message = F, warning = F}
 #Two-way ANOVA on base diameter data with treatment and date as fixed effects, and 
 #anemone ID as a random effect:
 base_aov <- aov(log_diameter ~ Treatment*Date + random(Anemone_ID), 
@@ -466,7 +488,7 @@ AIC(base_aov)
 ## Plots
 
 Boxplot of feeding time data for each treatment and measurement time:
-```{r, message = F, warning = F}
+```{r, cache = TRUE,message = F, warning = F}
 ggplot(food_clean, 
        aes(fill = Treatment, 
            x=Event, 
@@ -476,16 +498,18 @@ ggplot(food_clean,
   labs(x = "Measurement time", 
        y = "Feeding time (min)") +
   scale_fill_manual(values =c('#89226AFF','#56B4E9FF','#E65154FF')) +
-  theme(axis.text=element_text(size=15),
-        axis.title=element_text(size=20), 
-        legend.text=element_text(size=15), 
-        legend.title=element_text(size=20))
+  theme(axis.text=element_text(size=10),
+        axis.title=element_text(size=15), 
+        legend.text=element_text(size=10), 
+        legend.title=element_text(size=15))
 ggsave(path = "plots",filename = "food_boxplot.png", width = 10, height = 7)
 ```
 
+\newpage
+
 ## Analyzing feeding time data
 
-```{r, message = F, warning = F}
+```{r, cache = TRUE, message = F, warning = F}
 shapiro.test(food_clean$Feeding_Time_Min)
 bartlett.test(Feeding_Time_Min ~ Treatment, 
               data = food_clean)
@@ -506,7 +530,7 @@ food_clean %>%
 ```
 
 Performing two-way ANOVA on log transformed feeding time data:
-```{r, message = F, warning = F}
+```{r, cache = TRUE,message = F, warning = F}
 #Two-way anova with treatment and date as fixed effects, and anemone ID as a random effect
 food_aov <- aov(log_Feeding_Time_Min ~ Treatment*Date + random(Anemone_ID), 
                 data=food_clean)
@@ -517,12 +541,14 @@ TukeyHSD(food_aov)
 AIC(food_aov)
 ```
 
+\newpage
+
 # Heatwave response data analysis
 
 ## Plots
 
 Creating a stacked bar plot showing proportions of open, closed, and partially open anemones at each hour of the heatwave on each day
-```{r, message = F, warning = F}
+```{r, cache = TRUE,message = F, warning = F}
 ggplot(data = open_closed_summary, 
        aes(x = Time_Block, 
            y = n, 
@@ -535,18 +561,20 @@ ggplot(data = open_closed_summary,
        fill = "Behaviour") +
   theme_classic()+
 scale_fill_manual(values = c('#FFE082','#2C728EFF','#E65154FF'))+
-  theme(strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size= 15),
-        axis.text=element_text(size=15),
-        axis.title=element_text(size=20), 
-        legend.text=element_text(size=15), 
-        legend.title=element_text(size=20))
+  theme(strip.text.x = element_text(size = 10),
+        strip.text.y = element_text(size= 10),
+        axis.text=element_text(size=10),
+        axis.title=element_text(size=15), 
+        legend.text=element_text(size=10), 
+        legend.title=element_text(size=15))
 ggsave(path = "plots",filename = "open_closed_plot.png", width = 10, height = 7)
 ```
 
+\newpage
+
 ## Analyzing data
 Exploratory data analysis:
-```{r, message = F, warning = F}
+```{r, cache = TRUE,message = F, warning = F}
 #Summarizing the data
 summary(open_closed_summary)
 #Making frequency table
@@ -557,8 +585,8 @@ table(open_closed_clean$Treatment,
 
 
 Ordinal regression model (unsuccessful)
-```{r, echo = F message = F, warning = F}
-ord_model = clmm(Open_Closed ~ Treatment:Time_Block:Date + (1|Anemone_ID), 
+```{r, echo = F, message = F, warning = F}
+ord_model = ordinal::clmm(Open_Closed ~ Treatment:Time_Block:Date + (1|Anemone_ID), 
                  data = open_closed_clean)
 summary(ord_model)
 #This technique did not accurately model our data due to the low frequencies of measurements 
@@ -566,7 +594,7 @@ summary(ord_model)
 ```
 
 Bayesian regression analysis
-```{r, message = F, warning = F}
+```{r, cache = TRUE, results = FALSE, message = F, warning = F}
 #Running a Bayesian model with weakly flat priors. 
 #Fixed effects are treatment, time block, and date. 
 #Anemone ID is a random effect.
@@ -574,31 +602,37 @@ Bayesian regression analysis
 #Run this code once before running model
 #options(mc.cores=parallel::detectCores())
 
-#bay_mod <- brm(Open_Closed ~ Treatment + Time_Block + Date + (1|Anemone_ID), 
-               #data = open_closed_clean, 
-               #family = cumulative("logit"))
-#summary(bay_mod)
+bay_mod <- brm(Open_Closed ~ Treatment + Time_Block + Date + (1|Anemone_ID),   
+               data = open_closed_clean,   
+               family = cumulative("logit")) 
+
+```
+
+```{r, cache = TRUE, message = F, warning = F}
+summary(bay_mod)  
 
 #Calculating percent confidence for each treatment, date, and time block
-#response_post = posterior_samples(bay_mod)
-#sum(response_post$b_Treatment30C > 0) / 4000 # 0.82275
-#sum(response_post$b_Treatment25C > 0) / 4000 # 0.2765
-#sum(response_post$b_Time_Block1 > 0) / 4000 # 0.888
-#sum(response_post$b_Time_Block2 > 0) / 4000 #0.9975
-#sum(response_post$b_Time_Block3 > 0) / 4000 # 0.88
-#sum(response_post$b_Time_Block4 > 0) / 4000 # 0.99875
-#sum(response_post$b_Time_Block5 > 0) / 4000 # 1
-#sum(response_post$b_Time_Block6 > 0) / 4000 # 1
-#sum(response_post$b_Date11D7D2021 > 0) / 4000 # 0.17525
-#sum(response_post$b_Date11D8D2021 > 0) / 4000 # 0.42775
+response_post = posterior_samples(bay_mod)
+sum(response_post$b_Treatment30C > 0) / 4000 
+sum(response_post$b_Treatment25C > 0) / 4000 
+sum(response_post$b_Time_Block1 > 0) / 4000 
+sum(response_post$b_Time_Block2 > 0) / 4000 
+sum(response_post$b_Time_Block3 > 0) / 4000 
+sum(response_post$b_Time_Block4 > 0) / 4000 
+sum(response_post$b_Time_Block5 > 0) / 4000 
+sum(response_post$b_Time_Block6 > 0) / 4000 
+sum(response_post$b_Date11D7D2021 > 0) / 4000 
+sum(response_post$b_Date11D8D2021 > 0) / 4000 
 ```
+
+\newpage
 
 # Hemocytometer data analysis
 
 ## Plots
 
 Boxplots of dinoflagellate density and mitotic index at each measurement time:
-```{r, message = F, warning = F}
+```{r, cache = TRUE,message = F, warning = F}
 #Dinoflagellate density
 p1 <- ggplot(data = hemo_summary, 
        aes(x= Date, 
@@ -653,13 +687,15 @@ p2 = ggplot(data = hemo_summary,
 #Combining plots
 p1 + p2
 
-ggsave(path = "plots",filename = "dinoflagellate_density_MI.png", width = 10, height = 4)
+ggsave(path = "plots",filename = "dinoflagellate_density_MI.png", width = 15, height = 4)
 ```
+
+\newpage
 
 ## Analyzing zooxanthellae density and mitotic index
 
 ### Zooxanthellae density
-```{r, message = F, warning = F}
+```{r, cache = TRUE,message = F, warning = F}
 #Dinoflagellate density
 shapiro_test(hemo_clean$Dino_Density)
 bartlett.test(Dino_Density ~ Treatment, 
@@ -682,7 +718,7 @@ hemo_clean %>%
 ```
 
 Two-way AVOVA on zooxanthellae density data:
-```{r, message = F, warning = F}
+```{r, cache = TRUE, message = F, warning = F}
 Dino_Density_aov <- aov(log_Dino_Density ~ Treatment*as.factor(Date) + random(Anemone_ID),
                         data=hemo_clean)
 summary(Dino_Density_aov)
@@ -692,9 +728,8 @@ TukeyHSD(Dino_Density_aov)
 AIC(Dino_Density_aov)
 ```
 
-
 ### Zooxanthellae mitotic index
-```{r}
+```{r, cache = TRUE, message = F, warning = F}
 #Dinoflagellate mitotic index
 shapiro_test(hemo_clean$Dino_MI)
 bartlett.test(Dino_MI ~ Treatment, 
@@ -725,7 +760,7 @@ hemo_clean %>%
 ```
 
 Two-way ANOVA on mitotic index data:
-```{r, message = F, warning = F}
+```{r, cache = TRUE, message = F, warning = F}
 #Dinoflagellate mitotic index
 Dino_MI_aov <- aov(log_Dino_MI ~ Treatment*as.factor(Date) + random(Anemone_ID), 
                    data=hemo_clean)
@@ -736,12 +771,14 @@ TukeyHSD(Dino_MI_aov)
 AIC(Dino_MI_aov)
 ```
 
+\newpage
+
 # Heatwave temperature
 
 ##Plots
 
 Creating a plot to show the average temperature in the final 3 hours of the heatwave (after the temperature ramp) on each day
-```{r, message = F, warning = F}
+```{r, cache = TRUE, message = F, warning = F}
 ggplot(data = temp_summary,
        aes(x=Time_Block, 
            y = mean_temp,
@@ -755,11 +792,11 @@ ggplot(data = temp_summary,
   scale_colour_manual(values = c('#89226AFF','#56B4E9FF','#E65154FF'))+
   labs(x="Time (Hours)", 
        y ="Temperature (°C)") +
-  theme(strip.text.y = element_text(size = 15),
-       axis.text=element_text(size=15),
-       axis.title=element_text(size=20), 
-       legend.text=element_text(size=15), 
-       legend.title=element_text(size=20))
+  theme(strip.text.x = element_text(size = 10),
+       axis.text=element_text(size=10),
+       axis.title=element_text(size=15), 
+       legend.text=element_text(size=10), 
+       legend.title=element_text(size=15))
   
 ggsave(path = "plots",filename = "temp_plot.png", width = 10, height = 7)
 ```
